@@ -1,1 +1,861 @@
 
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programa Visita SC - CHI-03</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f5f7fa;color:#1a1a1a;line-height:1.6;padding-bottom:40px;font-size:16px}
+header{background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:24px 20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1);position:relative}
+header h1{font-size:1.5rem;margin-bottom:8px;font-weight:700}
+header p{opacity:0.95;font-size:1.05rem}
+.admin-btn{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.2);border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s}
+.admin-btn:hover{background:rgba(255,255,255,.35);transform:scale(1.05)}
+.container{max-width:800px;margin:24px auto;padding:0 20px}
+.card{background:#fff;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.08);border-left:5px solid #0066cc}
+.card h3{font-size:1.25rem;margin-bottom:16px;color:#003366;font-weight:700;display:flex;align-items:center;gap:10px}
+label{display:block;font-size:.95rem;font-weight:600;margin-bottom:6px;color:#444}
+input,select,textarea{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:10px;font-size:1rem;margin-bottom:12px;background:#fff;transition:border-color .2s;min-height:48px}
+input:focus,select:focus,textarea:focus{border-color:#0066cc;outline:none}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.grid-5{display:grid;grid-template-columns:90px repeat(4,1fr);gap:8px;align-items:end;margin-bottom:10px;padding:12px;background:#f8f9fa;border-radius:10px}
+.grid-4{display:grid;grid-template-columns:100px repeat(3,1fr);gap:8px;align-items:end;margin-bottom:10px;padding:12px;background:#f8f9fa;border-radius:10px}
+.day{font-weight:700;font-size:1rem;color:#1a1a1a;padding-top:12px}
+.btn{width:100%;padding:18px;background:linear-gradient(135deg,#28a745 0%,#1e7e34 100%);color:#fff;border:none;border-radius:12px;font-size:1.15rem;font-weight:700;cursor:pointer;margin-top:12px;min-height:56px;transition:transform .1s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(40,167,69,.3)}
+.btn:active{transform:translateY(0)}
+.btn-add{background:#e3f2fd;color:#0066cc;border:2px dashed #0066cc;padding:14px;width:100%;border-radius:10px;cursor:pointer;font-size:1rem;margin-top:8px;min-height:52px;font-weight:600;transition:all .2s}
+.btn-add:hover{background:#bbdefb;border-style:solid}
+.btn-maps{background:linear-gradient(135deg,#4285f4 0%,#3367d6 100%);color:#fff;border:none;padding:12px 18px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;min-height:44px;transition:transform .1s}
+.btn-maps:hover{transform:scale(1.02)}
+.btn-whatsapp{background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:#fff;border:none;padding:12px 18px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;min-height:44px;transition:transform .1s}
+.btn-whatsapp:hover{transform:scale(1.02)}
+.note{background:#fff8e1;border:2px solid #ffd54f;border-left:5px solid #ffc107;padding:18px;border-radius:0 12px 12px 0;font-size:1rem;color:#7a5c00;margin:20px 0;line-height:1.7}
+.mm{background:#e3f2fd;border-left:5px solid #0066cc;padding:20px;border-radius:0 12px 12px 0;font-size:.95rem;color:#003366;margin:20px 0;line-height:1.7}
+.mm strong{display:block;margin-bottom:6px;font-size:1.1rem;color:#003366}
+.remove{background:#ffebee;color:#c62828;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.9rem;position:absolute;right:12px;top:12px;font-weight:600;transition:all .2s}
+.remove:hover{background:#ef5350;color:#fff}
+.ubicacion-box{background:#e8f5e9;border:2px solid #4caf50;padding:18px;border-radius:12px;margin-bottom:20px}
+.ubicacion-box label{color:#2e7d32;font-size:1.05rem}
+.contacto-box{background:#fff3e0;border:2px solid #ff9800;padding:14px;border-radius:10px;margin-top:10px;font-size:.95rem;line-height:1.6}
+.maps-link{color:#1565c0;text-decoration:none;font-size:.95rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:8px 0;transition:color .2s}
+.maps-link:hover{color:#0d47a1;text-decoration:underline}
+.maps-link:before{content:"🗺️";font-size:1.2rem}
+
+/* CAMPOS OCULTOS PARA HOSPEDAJE */
+.direccion-hospedaje{display:none}
+.direccion-hospedaje.visible{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.hospedaje-badge{display:inline-block;background:#4caf50;color:#fff;padding:6px 14px;border-radius:20px;font-size:.9rem;font-weight:600;margin-top:8px}
+.hospedaje-info{background:#e8f5e9;border:2px solid #4caf50;padding:12px;border-radius:10px;margin-top:10px;color:#2e7d32;font-size:.95rem}
+
+/* SECCIÓN ADMIN */
+.admin-section{background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%);border:3px solid #ff9800;padding:24px;border-radius:16px;margin-bottom:24px;display:none}
+.admin-section.active{display:block;animation:slideDown .3s ease}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.admin-section h3{color:#e65100;font-size:1.3rem;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.admin-section h3:before{content:"🔐";font-size:1.4rem}
+.tema-input{background:#fff;border:2px solid #ff9800;padding:16px;border-radius:12px;margin-bottom:14px}
+.tema-input label{color:#e65100;font-size:1rem;font-weight:700}
+.tema-input input,.tema-input textarea{width:100%;padding:12px;border:2px solid #ffd54f;border-radius:8px;font-size:.95rem;margin-top:8px;margin-bottom:0;background:#fff8e1}
+.tema-input textarea{min-height:80px;resize:vertical}
+.tema-input small{display:block;margin-top:6px;color:#666;font-size:.85rem}
+.badge-admin{display:inline-block;background:#ff9800;color:#fff;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:700;margin-left:10px}
+
+/* BOTÓN DE AYUDA */
+.help-button{position:fixed;bottom:30px;right:30px;width:72px;height:72px;background:linear-gradient(135deg,#ff6b35 0%,#ff5722 100%);color:#fff;border-radius:50%;border:none;font-size:2.2rem;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,53,.4);z-index:1000;transition:all .3s;display:flex;align-items:center;justify-content:center}
+.help-button:hover{transform:scale(1.1) rotate(10deg);box-shadow:0 8px 25px rgba(255,107,53,.5)}
+.help-button.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 6px 20px rgba(255,107,53,.4)}50%{box-shadow:0 6px 30px rgba(255,107,53,.7)}}
+
+/* MODALES */
+.help-overlay,.password-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);display:none;z-index:1001;backdrop-filter:blur(4px)}
+.help-modal,.password-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:92%;max-width:750px;max-height:90vh;overflow-y:auto;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);z-index:1002;display:none}
+.password-modal{max-width:400px;padding:32px;text-align:center}
+.password-modal h3{color:#e65100;font-size:1.4rem;margin-bottom:20px}
+.password-modal input{width:100%;padding:16px;border:3px solid #ff9800;border-radius:12px;font-size:1.2rem;text-align:center;margin-bottom:16px;letter-spacing:2px}
+.password-modal .btn-admin{background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%);color:#fff;border:none;padding:16px;width:100%;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;margin-top:8px}
+.password-modal .error{color:#c62828;font-size:.95rem;margin-top:12px;display:none}
+.password-modal .hint{color:#666;font-size:.85rem;margin-top:16px;font-style:italic}
+
+.progress-indicator{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#0066cc,#00c853);transition:width .3s;z-index:9999}
+
+@media(max-width:680px){
+  .grid-5,.grid-4,.grid-2,.grid-3{grid-template-columns:1fr}
+  .day{background:#e8e8e8;padding:10px;border-radius:8px;margin-bottom:8px}
+  .help-button{width:64px;height:64px;font-size:2rem;bottom:20px;right:20px}
+  .help-modal,.password-modal{width:95%;max-height:95vh}
+  body{font-size:15px}
+  .card{padding:18px}
+  header h1{font-size:1.3rem}
+  .admin-btn{top:10px;right:10px;padding:8px 12px;font-size:.8rem}
+}
+</style>
+</head>
+<body>
+
+<div class="progress-indicator" id="progressBar" style="width:0%"></div>
+
+<header>
+  <h1>📋 Programa de Visita del SC</h1>
+  <p>CHI-03 • Marzo a Agosto 2026</p>
+  <button class="admin-btn" onclick="mostrarLoginAdmin()">🔐 Admin</button>
+</header>
+
+<div class="container">
+  
+  <!-- SECCIÓN ADMIN -->
+  <div class="admin-section" id="adminSection">
+    <h3>Configuración de Temas de Discursos <span class="badge-admin">MODO ADMIN</span></h3>
+    <p style="margin-bottom:16px;color:#666;font-size:.95rem">Estos temas aparecerán en el PDF generado. Modifíquelos según las indicaciones del SC.</p>
+    
+    <div class="tema-input">
+      <label>Martes - 1er Discurso</label>
+      <textarea id="tema_martes">¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?</textarea>
+      <small>Canción 76</small>
+    </div>
+    
+    <div class="tema-input">
+      <label>Miércoles/Sábado - Precursores</label>
+      <textarea id="tema_miercoles">SIGA ADELANTE HACIA LA META (Fil. 3:14)</textarea>
+    </div>
+    
+    <div class="tema-input">
+      <label>Viernes - Ancianos/SM</label>
+      <textarea id="tema_viernes">SIGAN PROGRESANDO "COMO REGALOS" DE DIOS (Ef 4:8)</textarea>
+    </div>
+    
+    <div class="tema-input">
+      <label>Sábado/Domingo - Discurso Público</label>
+      <textarea id="tema_sabado">CÓMO COSECHAR VIDA ETERNA</textarea>
+      <small>Canción 145</small>
+    </div>
+    
+    <div class="tema-input">
+      <label>2do Discurso - Servicio</label>
+      <textarea id="tema_2do">"JEHOVÁ NO RETENDRÁ NADA BUENO..."</textarea>
+      <small>Canción 155</small>
+    </div>
+    
+    <div class="grid-2" style="margin-top:20px">
+      <button type="button" class="btn" onclick="guardarTemas()" style="background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%)">💾 Guardar Cambios</button>
+      <button type="button" class="btn" onclick="restaurarTemas()" style="background:#757575">↩️ Restaurar Originales</button>
+    </div>
+    
+    <div class="success-box" id="guardadoMsg" style="display:none;margin-top:16px;background:#e8f5e9;border:2px solid #4caf50;padding:14px;border-radius:10px;color:#2e7d32">
+      ✅ ¡Temas guardados correctamente! Se aplicarán al generar el PDF.
+    </div>
+  </div>
+
+  <form id="f">
+    
+    <!-- UBICACIÓN DEL SC -->
+    <div class="card" style="border-left-color:#4caf50">
+      <h3 style="color:#2e7d32">📍 Ubicación del SC (Hospedaje)</h3>
+      <div class="ubicacion-box">
+        <div class="grid-2">
+          <div>
+            <label>Dirección del Hospedaje *</label>
+            <input id="sc_direccion" required placeholder="Ej. Calle Principal 123, Colonia Centro, Ciudad Juárez">
+          </div>
+          <div>
+            <label>Teléfono de Contacto Local *</label>
+            <input id="sc_telefono" required placeholder="Ej. 656 123 4567">
+          </div>
+        </div>
+        <div style="margin-top:12px">
+          <button type="button" class="btn-maps" onclick="abrirMaps('sc_direccion')" style="width:100%;font-size:1.05rem">🗺️ Ver en Google Maps</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONFIGURACIÓN -->
+    <div class="card">
+      <h3>⚙️ Configuración</h3>
+      <div class="grid-2">
+        <div><label>Congregación *</label><input id="cong" required placeholder="Ej. Juárez Centro"></div>
+        <div><label>Fechas *</label><input id="fec" required placeholder="Ej. 15/03 al 20/03"></div>
+      </div>
+      <label style="margin-top:12px">📱 Número de WhatsApp del SC (con código de país, sin +)</label>
+      <input id="wa" value="526121418717" placeholder="Ej. 526121418717">
+      <small style="color:#666;font-size:.95rem;display:block;margin-top:6px">Ejemplo: México = 52 + 10 dígitos</small>
+    </div>
+
+    <!-- REUNIONES -->
+    <div class="card">
+      <h3>📅 REUNIONES</h3>
+      
+      <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #eee">
+        <div class="day">Martes</div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>HORA</label><input type="time" id="r1h"></div>
+          <div><label>LUGAR</label><input id="r1l" value="SALÓN DEL REINO"></div>
+        </div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>DIRECCIÓN</label><input id="r1d" placeholder="Dirección completa del salón"></div>
+          <div><label>TELÉFONO</label><input id="r1t" placeholder="Contacto del salón"></div>
+        </div>
+        <div id="link_r1d" style="margin-top:8px"></div>
+      </div>
+      
+      <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #eee">
+        <div class="grid-2">
+          <div class="day">Mié / Sábado</div>
+          <div><label>DÍA</label><select id="r2d"><option>Miércoles</option><option>Sábado</option></select></div>
+        </div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>HORA</label><input type="time" id="r2h"></div>
+          <div><label>LUGAR</label><input id="r2l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
+        </div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>DIRECCIÓN</label><input id="r2d_dir" placeholder="Dirección del lugar"></div>
+          <div><label>TELÉFONO</label><input id="r2t" placeholder="Contacto"></div>
+        </div>
+        <div id="link_r2d_dir" style="margin-top:8px"></div>
+      </div>
+      
+      <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #eee">
+        <div class="day">Viernes</div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>HORA</label><input type="time" id="r3h"></div>
+          <div><label>LUGAR</label><input id="r3l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
+        </div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>DIRECCIÓN</label><input id="r3d" placeholder="Dirección del lugar"></div>
+          <div><label>TELÉFONO</label><input id="r3t" placeholder="Contacto"></div>
+        </div>
+        <div id="link_r3d" style="margin-top:8px"></div>
+      </div>
+      
+      <div>
+        <div class="grid-2">
+          <div class="day">Sáb / Domingo</div>
+          <div><label>DÍA</label><select id="r4d"><option>Sábado</option><option>Domingo</option></select></div>
+        </div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>HORA</label><input type="time" id="r4h"></div>
+          <div><label>LUGAR</label><input id="r4l" value="SALÓN DEL REINO"></div>
+        </div>
+        <div class="grid-2" style="margin-top:10px">
+          <div><label>DIRECCIÓN</label><input id="r4d_dir" placeholder="Dirección del salón"></div>
+          <div><label>TELÉFONO</label><input id="r4t" placeholder="Contacto del salón"></div>
+        </div>
+        <div id="link_r4d_dir" style="margin-top:8px"></div>
+      </div>
+      
+      <small style="color:#666;display:block;margin-top:12px;font-size:.95rem;background:#f5f5f5;padding:10px;border-radius:8px">⚠️ Según tenga la reunión cada congregación - NO HAGA CAMBIOS sin consultar</small>
+    </div>
+
+    <!-- PREDICACIÓN GENERAL -->
+    <div class="card">
+      <h3>📢 PREDICACIÓN</h3>
+      <div id="pg"></div>
+    </div>
+
+    <!-- CON EL SC -->
+    <div class="card" style="border-left-color:#28a745">
+      <h3 style="color:#28a745">👤 CON EL SC</h3>
+      <div id="sc"></div>
+    </div>
+
+    <!-- CON LA ESPOSA -->
+    <div class="card" style="border-left-color:#9333ea">
+      <h3 style="color:#9333ea">👩 CON LA ESPOSA DEL SC</h3>
+      <div id="sp"></div>
+    </div>
+
+    <!-- ALIMENTOS CON LÓGICA DE HOSPEDAJE -->
+    <div class="card">
+      <h3>🍽️ ALIMENTOS</h3>
+      <div id="al"></div>
+      <small style="color:#666;font-size:.95rem;display:block;margin-top:10px;background:#f5f5f5;padding:10px;border-radius:8px">💡 Escriba "En el hospedaje" y los campos de dirección se ocultarán automáticamente</small>
+    </div>
+
+    <!-- VISITAS -->
+    <div class="card">
+      <h3>🏠 VISITAS DE PASTOREO</h3>
+      <div id="vis"></div>
+      <button type="button" class="btn-add" onclick="addVis()">➕ Agregar visita</button>
+    </div>
+
+    <!-- AGENDA -->
+    <div class="card">
+      <h3>📋 ASUNTOS PARA LA REUNIÓN CON ANCIANOS</h3>
+      <label>1.</label><textarea id="ag1" rows="2" placeholder="Escriba el primer asunto a tratar..."></textarea>
+      <label>2.</label><textarea id="ag2" rows="2" placeholder="Escriba el segundo asunto a tratar..."></textarea>
+      <label>3.</label><textarea id="ag3" rows="2" placeholder="Escriba el tercer asunto a tratar..."></textarea>
+    </div>
+
+  </form>
+
+  <button class="btn" onclick="gen()">📄 GENERAR PDF Y ENVIAR POR WHATSAPP</button>
+  
+  <button class="btn" onclick="enviarResumenUbicaciones()" style="background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%);margin-top:14px">📱 ENVIAR RESUMEN DE UBICACIONES AL SC</button>
+
+  <div class="mm">
+    <strong>📁 MULTIMEDIA JW Hub (CHI-03)</strong>
+    <em>Gilberto Flores Fabián • Actualización 7 de abril de 2026</em><br><br>
+    <strong>DISCURSO DEL MARTES:</strong> 3 videos en JW Hub → Documentos → Archivos multimedia<br>
+    • Vídeo 1-3: ¿Qué estás dispuesto a hacer "por las buenas noticias"? (3-4 min c/u)<br><br>
+    <strong>PR Y PA:</strong> Sin multimedia<br><br>
+    <strong>ANCIANOS Y SM:</strong> Repasar lecciones 10 y 27 de "Benefíciese"<br>
+    • 3 videos: "Los pastores hábiles capacitan..." (4-5 min c/u)<br><br>
+    <strong>DISCURSO PÚBLICO:</strong> 3 imágenes en JW Hub<br>
+    <strong>2DO DISCURSO SERVICIO:</strong> Sin multimedia<br><br>
+    <strong>P.D. CCA:</strong> Descargar archivos con anticipación
+  </div>
+
+  <div class="note">
+    <strong>📌 NOTA IMPORTANTE:</strong> Esta página no se debe pegar en el tablero de información.<br>
+    • Revisen que no se crucen horarios • Alimentos desde miércoles<br>
+    ✓ Domingo: análisis de informe con Comité de Servicio
+  </div>
+</div>
+
+<!-- BOTÓN DE AYUDA -->
+<button class="help-button pulse" onclick="abrirAyuda()" title="¿Necesita ayuda?">❓</button>
+
+<!-- MODAL DE AYUDA -->
+<div class="help-overlay" id="helpOverlay" onclick="cerrarAyuda()"></div>
+<div class="help-modal" id="helpModal">
+  <div class="help-header" style="background:linear-gradient(135deg,#ff6b35 0%,#ff5722 100%);color:#fff;padding:24px;border-radius:20px 20px 0 0;text-align:center;position:relative">
+    <h2 style="margin:0;font-size:1.6rem">❓ Centro de Ayuda</h2>
+    <button style="position:absolute;top:20px;right:24px;background:rgba(255,255,255,.25);border:none;color:#fff;font-size:2rem;cursor:pointer;width:44px;height:44px;border-radius:50%" onclick="cerrarAyuda()">×</button>
+  </div>
+  <div style="padding:28px">
+    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center">
+      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('inicio', this)">🏠 Inicio</button>
+      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('primeravez', this)">🆕 Primera vez</button>
+      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('pasoapaso', this)">📝 Paso a paso</button>
+      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('problemas', this)">🔧 Problemas</button>
+      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('faq', this)">❓ Preguntas</button>
+    </div>
+    
+    <div id="ayuda-inicio">
+      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">👋 Bienvenido</h3>
+      <p style="line-height:1.8;margin-bottom:16px">Esta herramienta organiza la visita del SC a su congregación. Está diseñada para ser <strong>fácil de usar</strong>, incluso sin experiencia tecnológica.</p>
+      <div style="background:#e8f5e9;border:2px solid #66bb6a;padding:18px;border-radius:12px;margin:16px 0;color:#2e7d32">
+        💡 <strong>¿Por dónde empezar?</strong> Toque <strong>"Primera vez"</strong> arriba para ver la guía paso a paso.
+      </div>
+    </div>
+    
+    <div id="ayuda-primeravez" style="display:none">
+      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">🆕 Guía para Usuarios Nuevos</h3>
+      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+        <strong>PASO 1:</strong> Complete <strong>"📍 Ubicación del SC"</strong> con dirección y teléfono del hospedaje.
+      </div>
+      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+        <strong>PASO 2:</strong> En <strong>"⚙️ Configuración"</strong> escriba congregación y fechas.
+      </div>
+      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+        <strong>PASO 3:</strong> Llene <strong>"📅 REUNIONES"</strong> con horarios y lugares.
+      </div>
+      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+        <strong>PASO 4:</strong> Complete <strong>"🍽️ ALIMENTOS"</strong>. Escriba "En el hospedaje" para ocultar dirección.
+      </div>
+      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+        <strong>PASO 5:</strong> Toque <strong>"📄 GENERAR PDF"</strong> para crear el documento oficial.
+      </div>
+    </div>
+    
+    <div id="ayuda-pasoapaso" style="display:none">
+      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">📝 Instrucciones Detalladas</h3>
+      <h4 style="margin:20px 0 12px">📍 Direcciones correctas:</h4>
+      <ul style="margin-left:24px;line-height:1.8">
+        <li>✅ <strong>Bien:</strong> "Calle Juárez 123, Centro, Ciudad Juárez"</li>
+        <li>❌ <strong>Evite:</strong> "Casa de hermano García" (sin calle)</li>
+      </ul>
+      <h4 style="margin:20px 0 12px">🍽️ Alimentos en hospedaje:</h4>
+      <p style="line-height:1.8">Escriba <strong>"En el hospedaje"</strong> en el campo de lugar y los campos de dirección se ocultarán automáticamente. Esto evita llenar información innecesaria.</p>
+    </div>
+    
+    <div id="ayuda-problemas" style="display:none">
+      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">🔧 Solución de Problemas</h3>
+      <p style="margin-bottom:12px"><strong>❌ "No se pudo generar el PDF"</strong></p>
+      <p style="margin-bottom:16px;color:#666">Espere 10-20 segundos tras abrir la página. Recargue si persiste (F5 en PC).</p>
+      <p style="margin-bottom:12px"><strong>❌ "No aparece el enlace de Maps"</strong></p>
+      <p style="margin-bottom:16px;color:#666">Escriba al menos 5 caracteres en la dirección. El enlace aparece automáticamente.</p>
+      <p style="margin-bottom:12px"><strong>❌ "La letra es muy pequeña"</strong></p>
+      <p style="color:#666">En PC: Ctrl + (+). En móvil: Separe dos dedos para hacer zoom.</p>
+    </div>
+    
+    <div id="ayuda-faq" style="display:none">
+      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">❓ Preguntas Frecuentes</h3>
+      <p style="margin-bottom:12px"><strong>🤔 ¿Se guarda automáticamente?</strong></p>
+      <p style="margin-bottom:16px;color:#666">No. Debe tocar <strong>"📄 GENERAR PDF"</strong> para guardar.</p>
+      <p style="margin-bottom:12px"><strong>🤔 ¿Puedo usarlo en celular?</strong></p>
+      <p style="margin-bottom:16px;color:#666">Sí. Funciona en Android, iPhone y computadoras.</p>
+      <p style="margin-bottom:12px"><strong>🤔 ¿Qué pasa si escribo "En el hospedaje"?</strong></p>
+      <p style="color:#666">Los campos de dirección se ocultan automáticamente. No necesita llenarlos.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DE CONTRASEÑA -->
+<div class="password-overlay" id="passwordOverlay" onclick="cerrarLoginAdmin()"></div>
+<div class="password-modal" id="passwordModal">
+  <h3>🔐 Acceso de Administrador</h3>
+  <p style="color:#666;margin-bottom:16px;font-size:.95rem">Ingrese la contraseña para editar los temas de los discursos</p>
+  <input type="password" id="passwordInput" placeholder="••••••••" maxlength="20" onkeypress="if(event.key==='Enter')verificarPassword()">
+  <button class="btn-admin" onclick="verificarPassword()">🔓 Desbloquear</button>
+  <div class="error" id="passwordError">❌ Contraseña incorrecta</div>
+  <div class="hint">💡 Pista: admin123</div>
+</div>
+
+<script>
+const dias=['Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const pref=['mie','jue','vie','sab','dom'];
+
+// TEMAS POR DEFECTO
+const temasDefault = {
+  martes: '¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?',
+  miercoles: 'SIGA ADELANTE HACIA LA META (Fil. 3:14)',
+  viernes: 'SIGAN PROGRESANDO "COMO REGALOS" DE DIOS (Ef 4:8)',
+  sabado: 'CÓMO COSECHAR VIDA ETERNA',
+  segundo: '"JEHOVÁ NO RETENDRÁ NADA BUENO..."'
+};
+
+// FUNCIONES ADMIN
+function mostrarLoginAdmin() {
+  document.getElementById('passwordOverlay').style.display = 'block';
+  document.getElementById('passwordModal').style.display = 'block';
+  document.getElementById('passwordInput').value = '';
+  document.getElementById('passwordError').style.display = 'none';
+  setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+}
+
+function cerrarLoginAdmin() {
+  document.getElementById('passwordOverlay').style.display = 'none';
+  document.getElementById('passwordModal').style.display = 'none';
+}
+
+function verificarPassword() {
+  if (document.getElementById('passwordInput').value === 'admin123') {
+    cerrarLoginAdmin();
+    document.getElementById('adminSection').classList.add('active');
+    document.getElementById('adminSection').scrollIntoView({ behavior: 'smooth' });
+    document.querySelector('.admin-btn').innerHTML = '🔓 Admin';
+    setTimeout(() => alert('✅ Modo Administrador activado\n\nAhora puede editar los temas de los discursos.'), 300);
+  } else {
+    document.getElementById('passwordError').style.display = 'block';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('passwordInput').focus();
+  }
+}
+
+function guardarTemas() {
+  document.getElementById('guardadoMsg').style.display = 'block';
+  setTimeout(() => document.getElementById('guardadoMsg').style.display = 'none', 3000);
+}
+
+function restaurarTemas() {
+  if (confirm('¿Restaurar temas originales del CHI-03?')) {
+    document.getElementById('tema_martes').value = temasDefault.martes;
+    document.getElementById('tema_miercoles').value = temasDefault.miercoles;
+    document.getElementById('tema_viernes').value = temasDefault.viernes;
+    document.getElementById('tema_sabado').value = temasDefault.sabado;
+    document.getElementById('tema_2do').value = temasDefault.segundo;
+    document.getElementById('guardadoMsg').textContent = '✅ Temas restaurados a valores originales';
+    document.getElementById('guardadoMsg').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('guardadoMsg').style.display = 'none';
+      document.getElementById('guardadoMsg').textContent = '✅ ¡Temas guardados correctamente!';
+    }, 3000);
+  }
+}
+
+// AYUDA
+function abrirAyuda() {
+  document.getElementById('helpOverlay').style.display = 'block';
+  document.getElementById('helpModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  document.querySelector('.help-button').classList.remove('pulse');
+}
+
+function cerrarAyuda() {
+  document.getElementById('helpOverlay').style.display = 'none';
+  document.getElementById('helpModal').style.display = 'none';
+  document.body.style.overflow = 'auto';
+}
+
+function mostrarSeccionAyuda(id, btn) {
+  ['inicio','primeravez','pasoapaso','problemas','faq'].forEach(s => document.getElementById('ayuda-'+s).style.display = 'none');
+  document.getElementById('ayuda-'+id).style.display = 'block';
+  btn.parentNode.querySelectorAll('button').forEach(b => b.style.cssText = 'flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600');
+  btn.style.cssText = 'flex:1;min-width:140px;padding:14px;background:#0066cc;color:#fff;border:2px solid #0066cc;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600';
+}
+
+// MAPS
+function generarLinkMaps(inputId, containerId) {
+  const input = document.getElementById(inputId);
+  const container = document.getElementById(containerId);
+  input.addEventListener('input', function() {
+    const direccion = this.value.trim();
+    if (direccion.length > 5) {
+      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
+      container.innerHTML = `<a href="${url}" target="_blank" class="maps-link">🗺️ Ver "${direccion.substring(0,40)}${direccion.length>40?'...':''}" en Google Maps →</a>`;
+    } else {
+      container.innerHTML = '';
+    }
+  });
+}
+
+function abrirMaps(inputId) {
+  const direccion = document.getElementById(inputId).value;
+  if (!direccion) { alert('⚠️ Primero escriba una dirección'); return; }
+  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`, '_blank');
+}
+
+// ALIMENTOS CON LÓGICA DE HOSPEDAJE
+function toggleDireccionHospedaje(tipo, index) {
+  const lugarInput = document.getElementById(`al_${tipo}${index}`);
+  const direccionDiv = document.getElementById(`div_al_${tipo}_dir${index}`);
+  const telefonoInput = document.getElementById(`al_${tipo}_tel${index}`);
+  const linkDiv = document.getElementById(`link_al_${tipo}_dir${index}`);
+  
+  const esHospedaje = lugarInput.value.trim().toLowerCase().includes('hospedaje');
+  
+  if (esHospedaje) {
+    direccionDiv.classList.remove('visible');
+    direccionDiv.style.display = 'none';
+    telefonoInput.style.display = 'none';
+    linkDiv.innerHTML = '<span class="hospedaje-badge">🏠 En el hospedaje - Sin dirección adicional</span>';
+    document.getElementById(`al_${tipo}_dir${index}`).value = 'En el hospedaje';
+  } else {
+    direccionDiv.style.display = 'block';
+    direccionDiv.classList.add('visible');
+    telefonoInput.style.display = 'block';
+    linkDiv.innerHTML = '';
+    if (document.getElementById(`al_${tipo}_dir${index}`).value === 'En el hospedaje') {
+      document.getElementById(`al_${tipo}_dir${index}`).value = '';
+    }
+  }
+}
+
+// GENERAR SECCIONES
+pref.forEach((p,i)=>{
+  // Predicación
+  document.getElementById('pg').innerHTML+=`<div class="grid-5"><div class="day">${dias[i]}</div>
+  <div><label>MAÑANA</label><input type="time" id="pg_m${i}" ${i===0||i===2?'value="09:15"':''}></div>
+  <div><label>TARDE</label><input type="time" id="pg_t${i}" ${i===0||i===2?'value="17:00"':''}></div>
+  <div><label>LUGAR</label><input id="pg_l${i}"></div>
+  <div><label>TERR.</label><input id="pg_ter${i}"></div></div>`;
+  
+  // Con SC
+  document.getElementById('sc').innerHTML+=`<div class="grid-5"><div class="day">${dias[i]}</div>
+  <div><label>MAÑANA</label><input type="time" id="sc_m${i}"></div>
+  <div><label>HERMANO</label><input id="sc_n1${i}"></div>
+  <div><label>TARDE</label><input type="time" id="sc_t${i}"></div>
+  <div><label>HERMANO</label><input id="sc_n2${i}"></div></div>`;
+  
+  // Con Esposa
+  document.getElementById('sp').innerHTML+=`<div class="grid-5"><div class="day">${dias[i]}</div>
+  <div><label>MAÑANA</label><input type="time" id="sp_m${i}"></div>
+  <div><label>HERMANA</label><input id="sp_n1${i}"></div>
+  <div><label>TARDE</label><input type="time" id="sp_t${i}"></div>
+  <div><label>HERMANA</label><input id="sp_n2${i}"></div></div>`;
+  
+  // Alimentos con lógica de hospedaje
+  const cenDef = i===1||i===3||i===4 ? 'En el hospedaje' : '';
+  document.getElementById('al').innerHTML+=`
+  <div style="margin-bottom:20px;padding:16px;background:#f8f9fa;border-radius:12px;border-left:4px solid #ff9800">
+    <div class="day" style="margin-bottom:12px">${dias[i]}</div>
+    
+    <!-- DESAYUNO -->
+    <div style="background:#fff;padding:14px;border-radius:10px;margin-bottom:12px">
+      <label style="color:#ff9800;font-size:1.05rem">🌅 DESAYUNO</label>
+      <input id="al_d${i}" value="En el hospedaje" style="margin-bottom:6px" oninput="toggleDireccionHospedaje('d',${i})">
+      <div id="div_al_d_dir${i}" class="direccion-hospedaje" style="display:none">
+        <input id="al_d_dir${i}" placeholder="📍 Dirección (si aplica)">
+        <input id="al_d_tel${i}" placeholder="📞 Teléfono (si aplica)">
+      </div>
+      <div id="link_al_d_dir${i}"></div>
+    </div>
+    
+    <!-- COMIDA -->
+    <div style="background:#fff;padding:14px;border-radius:10px;margin-bottom:12px">
+      <label style="color:#e65100;font-size:1.05rem">🍖 COMIDA</label>
+      <input id="al_c${i}" placeholder="Lugar de la comida" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('c',${i})">
+      <div id="div_al_c_dir${i}" class="direccion-hospedaje">
+        <input id="al_c_dir${i}" placeholder="📍 Dirección completa">
+        <input id="al_c_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
+      </div>
+      <div id="link_al_c_dir${i}"></div>
+    </div>
+    
+    <!-- CENA -->
+    <div style="background:#fff;padding:14px;border-radius:10px">
+      <label style="color:#5d4037;font-size:1.05rem">🌙 CENA</label>
+      <input id="al_n${i}" value="${cenDef}" placeholder="Lugar de la cena" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('n',${i})">
+      <div id="div_al_n_dir${i}" class="direccion-hospedaje ${cenDef ? '' : 'visible'}" style="${cenDef ? 'display:none' : ''}">
+        <input id="al_n_dir${i}" placeholder="📍 Dirección completa">
+        <input id="al_n_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
+      </div>
+      <div id="link_al_n_dir${i}"></div>
+    </div>
+  </div>`;
+  
+  // Inicializar lógica de hospedaje
+  setTimeout(() => {
+    // Desayuno siempre es hospedaje por defecto
+    toggleDireccionHospedaje('d', i);
+    // Cena según día
+    if (cenDef) toggleDireccionHospedaje('n', i);
+    
+    // Listeners para Maps
+    generarLinkMaps(`al_c_dir${i}`, `link_al_c_dir${i}`);
+    generarLinkMaps(`al_n_dir${i}`, `link_al_n_dir${i}`);
+  }, 100);
+});
+
+// Visitas
+let vc=0;
+function addVis(){
+  const index = vc;
+  document.getElementById('vis').innerHTML+=`<div id="vr${index}" style="margin-bottom:14px;padding:16px;background:#f8f9fa;border-radius:12px;position:relative;border-left:4px solid #0066cc">
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px">
+    <div><label>DÍA</label><select id="vd${index}"><option>Mié</option><option>Jue</option><option>Vie</option><option>Sáb</option><option>Dom</option></select></div>
+    <div><label>HORA</label><input type="time" id="vh${index}"></div>
+  </div>
+  <div style="margin-bottom:12px"><label>FAMILIA</label><input id="vf${index}" placeholder="Apellido de la familia"></div>
+  <div style="margin-bottom:12px"><label>ANCIANO/SM</label><input id="va${index}" placeholder="Nombre del anciano o SM"></div>
+  <div style="background:#e3f2fd;padding:16px;border-radius:10px;margin-bottom:12px">
+    <label style="color:#1565c0;font-size:1.05rem">📍 DIRECCIÓN COMPLETA</label>
+    <input id="vdir${index}" placeholder="Calle, número, colonia, ciudad" style="margin-bottom:10px">
+    <input id="vtel${index}" placeholder="📞 Teléfono de la familia o anciano" style="margin-bottom:10px">
+    <div id="link_vdir${index}"></div>
+    <div class="contacto-box" style="margin-top:12px">💡 <strong>Referencia:</strong> "casa blanca con portón negro, frente a farmacia"</div>
+  </div>
+  ${index>0?`<button type="button" class="remove" onclick="this.parentElement.remove()" style="position:absolute;top:14px;right:14px">✕ Eliminar</button>`:''}
+  </div>`;
+  
+  setTimeout(() => generarLinkMaps(`vdir${index}`, `link_vdir${index}`), 100);
+  vc++;
+}
+addVis();addVis();addVis();
+
+// Listeners reuniones
+setTimeout(() => {
+  ['r1d','r2d_dir','r3d','r4d_dir'].forEach(id => {
+    generarLinkMaps(id, 'link_'+id);
+    document.getElementById(id)?.addEventListener('input', actualizarProgreso);
+  });
+  actualizarProgreso();
+}, 100);
+
+function actualizarProgreso() {
+  const campos = document.querySelectorAll('input[required], input[id$="d"]:not([id^="al_d"])');
+  let completados = 0;
+  campos.forEach(c => { if (c.value.trim()) completados++; });
+  document.getElementById('progressBar').style.width = Math.min((completados/campos.length)*100,100)+'%';
+}
+
+// WHATSAPP
+function enviarResumenUbicaciones() {
+  const waNum = document.getElementById('wa').value.replace(/\D/g,'') || '526121418717';
+  const cong = document.getElementById('cong').value || '______________';
+  const fec = document.getElementById('fec').value || '______________';
+  
+  let mensaje = `📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n`;
+  
+  // Hospedaje
+  const scDir = document.getElementById('sc_direccion').value;
+  if (scDir) {
+    mensaje += `🏠 *HOSPEDAJE SC:*\n📍 ${scDir}\n📞 ${document.getElementById('sc_telefono').value||'-'}\n🗺️ ${generarUrlMaps(scDir)}\n\n`;
+  }
+  
+  // Reuniones
+  mensaje += `*📅 REUNIONES:*\n\n`;
+  const reuniones = [
+    {n:'Martes - 1er Discurso',d:'r1d',t:'r1t',h:'r1h'},
+    {n:document.getElementById('r2d').value+' - Precursores',d:'r2d_dir',t:'r2t',h:'r2h'},
+    {n:'Viernes - Ancianos/SM',d:'r3d',t:'r3t',h:'r3h'},
+    {n:document.getElementById('r4d').value+' - Discurso Público',d:'r4d_dir',t:'r4t',h:'r4h'}
+  ];
+  reuniones.forEach(r => {
+    const dir = document.getElementById(r.d).value;
+    if (dir) {
+      mensaje += `• *${r.n}*\n`;
+      if (document.getElementById(r.h).value) mensaje += `🕐 ${document.getElementById(r.h).value}\n`;
+      mensaje += `📍 ${dir}\n`;
+      if (document.getElementById(r.t).value) mensaje += `📞 ${document.getElementById(r.t).value}\n`;
+      mensaje += `🗺️ ${generarUrlMaps(dir)}\n\n`;
+    }
+  });
+  
+  // Alimentos
+  let msgAlim = `*🍽️ ALIMENTOS:*\n\n`;
+  let tieneAlim = false;
+  pref.forEach((p,i) => {
+    const c = document.getElementById(`al_c${i}`).value;
+    const cDir = document.getElementById(`al_c_dir${i}`).value;
+    const n = document.getElementById(`al_n${i}`).value;
+    const nDir = document.getElementById(`al_n_dir${i}`).value;
+    
+    if (c || n) {
+      tieneAlim = true;
+      msgAlim += `*${dias[i]}:*\n`;
+      if (c) {
+        msgAlim += `🍖 ${c}\n`;
+        if (cDir && !cDir.includes('hospedaje')) {
+          msgAlim += `📍 ${cDir}\n🗺️ ${generarUrlMaps(cDir)}\n`;
+        } else if (cDir.includes('hospedaje')) {
+          msgAlim += `🏠 En el hospedaje\n`;
+        }
+      }
+      if (n) {
+        msgAlim += `🌙 ${n}\n`;
+        if (nDir && !nDir.includes('hospedaje')) {
+          msgAlim += `📍 ${nDir}\n🗺️ ${generarUrlMaps(nDir)}\n`;
+        } else if (nDir.includes('hospedaje')) {
+          msgAlim += `🏠 En el hospedaje\n`;
+        }
+      }
+      msgAlim += `\n`;
+    }
+  });
+  if (tieneAlim) mensaje += msgAlim;
+  
+  // Visitas
+  let msgVis = `*🏠 VISITAS:*\n\n`;
+  let tieneVis = false;
+  for (let i=0; i<vc; i++) {
+    const r = document.getElementById(`vr${i}`);
+    if (r) {
+      const dia = document.getElementById(`vd${i}`).value;
+      const hora = document.getElementById(`vh${i}`).value;
+      const fam = document.getElementById(`vf${i}`).value;
+      const dir = document.getElementById(`vdir${i}`)?.value;
+      if (dir) {
+        tieneVis = true;
+        msgVis += `• *${dia}${hora?' - '+hora:''}*\n`;
+        if (fam) msgVis += `👨‍👩‍👧‍👦 ${fam}\n`;
+        msgVis += `📍 ${dir}\n🗺️ ${generarUrlMaps(dir)}\n\n`;
+      }
+    }
+  }
+  if (tieneVis) mensaje += msgVis;
+  
+  mensaje += `\n💡 *Para rutas:* Abra cualquier enlace en Google Maps y toque "Cómo llegar"`;
+  window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(mensaje)}`, '_blank');
+}
+
+function generarUrlMaps(direccion) {
+  return `https://maps.google.com/?q=${encodeURIComponent(direccion)}`;
+}
+
+// PDF
+async function gen(){
+  const f=document.getElementById('f');
+  if(!f.checkValidity()){f.reportValidity();return;}
+  if(typeof window.jspdf==='undefined'){alert('⚠️ Espere unos segundos e intente de nuevo.');return;}
+  
+  const{jsPDF}=window.jspdf;const doc=new jsPDF();
+  const W=doc.internal.pageSize.getWidth();const M=14;
+  
+  // Header
+  doc.setFillColor(0,102,204);doc.rect(0,0,W,38,'F');
+  doc.setTextColor(255);doc.setFontSize(14);doc.setFont('helvetica','bold');
+  doc.text('PROGRAMA DE ACTIVIDADES DURANTE LA VISITA DEL SC',W/2,14,{align:'center'});
+  doc.setFontSize(11);doc.text('A LA CONGREGACIÓN',W/2,22,{align:'center'});
+  doc.setFontSize(10);doc.text('FECHA: MARZO A AGOSTO DE 2026',W/2,30,{align:'center'});
+  const con=document.getElementById('cong').value.toUpperCase()||'______________';
+  const fec=document.getElementById('fec').value||'______________';
+  doc.setFontSize(9);doc.text(`CONGREGACIÓN: ${con}   FECHA: ${fec}`,M,36);
+  
+  // TEMAS PERSONALIZADOS
+  const temaMartes = document.getElementById('tema_martes')?.value || temasDefault.martes;
+  const temaMierc = document.getElementById('tema_miercoles')?.value || temasDefault.miercoles;
+  const temaViern = document.getElementById('tema_viernes')?.value || temasDefault.viernes;
+  const temaSab = document.getElementById('tema_sabado')?.value || temasDefault.sabado;
+  const tema2do = document.getElementById('tema_2do')?.value || temasDefault.segundo;
+  
+  let y=45;
+  const chk=(n=15)=>{if(y+n>doc.internal.pageSize.getHeight()-18){doc.addPage();y=18;}};
+  const TS={theme:'grid',styles:{cellPadding:3,fontSize:8.5,overflow:'linebreak'},margin:{left:M,right:M},
+    headStyles:{fillColor:[230,240,250],textColor:[0,51,102],fontStyle:'bold'},alternateRowStyles:{fillColor:[248,249,250]}};
+  
+  // Reuniones
+  chk(35);doc.autoTable({...TS,startY:y,head:[['DÍA','HORA','REUNIÓN','LUGAR','DIRECCIÓN','TELÉFONO']],body:[
+    ['Martes',document.getElementById('r1h').value||'--',`1er disc.: ${temaMartes}\n(CANCIÓN 76)`,document.getElementById('r1l').value,document.getElementById('r1d').value||'-',document.getElementById('r1t').value||'-'],
+    [document.getElementById('r2d').value,document.getElementById('r2h').value||'--',`Precursores: ${temaMierc}`,document.getElementById('r2l').value,document.getElementById('r2d_dir').value||'-',document.getElementById('r2t').value||'-'],
+    ['Viernes',document.getElementById('r3h').value||'--',`Ancianos/SM: ${temaViern}`,document.getElementById('r3l').value,document.getElementById('r3d').value||'-',document.getElementById('r3t').value||'-'],
+    [document.getElementById('r4d').value,document.getElementById('r4h').value||'--',`Disc. Público: ${temaSab}\n(Can. 145)\n2do servicio: ${tema2do}\n(Can. 155)`,document.getElementById('r4l').value,document.getElementById('r4d_dir').value||'-',document.getElementById('r4t').value||'-']
+  ]});y=doc.lastAutoTable.finalY+6;
+  
+  // Predicación
+  chk(24);doc.autoTable({...TS,startY:y,head:[['DÍA','MAÑANA','TARDE','LUGAR','TERR.']],
+    body:pref.map((_,i)=>[dias[i],document.getElementById(`pg_m${i}`).value||'-',document.getElementById(`pg_t${i}`).value||'-',document.getElementById(`pg_l${i}`).value||'-',document.getElementById(`pg_ter${i}`).value||'-'])});y=doc.lastAutoTable.finalY+6;
+  
+  // Con SC
+  chk(24);doc.autoTable({...TS,startY:y,head:[['DÍA','MAÑANA','HERMANO','TARDE','HERMANO']],
+    body:pref.map((_,i)=>[dias[i],document.getElementById(`sc_m${i}`).value||'-',document.getElementById(`sc_n1${i}`).value||'-',document.getElementById(`sc_t${i}`).value||'-',document.getElementById(`sc_n2${i}`).value||'-'])});y=doc.lastAutoTable.finalY+6;
+  
+  // Con Esposa
+  chk(24);doc.autoTable({...TS,startY:y,head:[['DÍA','MAÑANA','HERMANA','TARDE','HERMANA']],
+    body:pref.map((_,i)=>[dias[i],document.getElementById(`sp_m${i}`).value||'-',document.getElementById(`sp_n1${i}`).value||'-',document.getElementById(`sp_t${i}`).value||'-',document.getElementById(`sp_n2${i}`).value||'-'])});y=doc.lastAutoTable.finalY+6;
+  
+  // Alimentos
+  chk(32);doc.autoTable({...TS,startY:y,head:[['DÍA','DESAYUNO','COMIDA','DIR. COMIDA','TEL. COMIDA','CENA','DIR. CENA','TEL. CENA']],
+    body:pref.map((_,i)=>{
+      const dVal = document.getElementById(`al_d${i}`).value;
+      const cVal = document.getElementById(`al_c${i}`).value;
+      const nVal = document.getElementById(`al_n${i}`).value;
+      return [
+        dias[i],
+        dVal||'-',
+        cVal||'-',
+        (cVal && cVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (document.getElementById(`al_c_dir${i}`)?.value||'-'),
+        (cVal && cVal.toLowerCase().includes('hospedaje')) ? '-' : (document.getElementById(`al_c_tel${i}`)?.value||'-'),
+        nVal||'-',
+        (nVal && nVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (document.getElementById(`al_n_dir${i}`)?.value||'-'),
+        (nVal && nVal.toLowerCase().includes('hospedaje')) ? '-' : (document.getElementById(`al_n_tel${i}`)?.value||'-')
+      ];
+    })});y=doc.lastAutoTable.finalY+6;
+  
+  // Visitas
+  chk(24);let vr=[];for(let i=0;i<vc;i++){const r=document.getElementById(`vr${i}`);if(r)vr.push([
+    document.getElementById(`vd${i}`).value,
+    document.getElementById(`vh${i}`).value||'-',
+    document.getElementById(`vf${i}`).value||'-',
+    document.getElementById(`va${i}`).value||'-',
+    document.getElementById(`vdir${i}`)?.value||'-',
+    document.getElementById(`vtel${i}`)?.value||'-'
+  ]);}
+  if(vr.length===0)vr.push(['-','-','-','-','-','-']);
+  doc.autoTable({...TS,startY:y,head:[['DÍA','HORA','FAMILIA','ANCIANO/SM','DIRECCIÓN','TELÉFONO']],body:vr});y=doc.lastAutoTable.finalY+6;
+  
+  // Agenda
+  chk(20);doc.autoTable({...TS,startY:y,head:[['#','ASUNTO']],body:[['1.',document.getElementById('ag1').value||'-'],['2.',document.getElementById('ag2').value||'-'],['3.',document.getElementById('ag3').value||'-']]});y=doc.lastAutoTable.finalY+7;
+  
+  // Footer info
+  chk(16);doc.setFillColor(232,245,233);doc.rect(M,y,W-M*2,14,'F');
+  doc.setTextColor(46,125,50);doc.setFontSize(8);
+  doc.text(`HOSPEDAJE SC: ${document.getElementById('sc_direccion').value||'No registrado'} | TEL: ${document.getElementById('sc_telefono').value||'-'}`,M+3,y+8);
+  y+=18;
+  
+  // Notas
+  chk(28);doc.setFillColor(255,248,225);doc.rect(M,y,W-M*2,28,'F');doc.setDrawColor(253,224,71);doc.rect(M,y,W-M*2,28,'S');
+  doc.setTextColor(120,53,15);doc.setFontSize(8.5);
+  doc.text('NOTA: Esta página no se debe pegar en el tablero. Revisen cruces de horario. Alimentos desde miércoles.',M+3,y+7);
+  doc.text('✓ Domingo: informe con Comité de Servicio. Multimedia: JW Hub → Documentos → Archivos multimedia.',M+3,y+14);
+  doc.text('🔗 Direcciones ocultas automáticamente cuando se indica "En el hospedaje".',M+3,y+21);
+  
+  // Footer páginas
+  for(let i=1;i<=doc.internal.getNumberOfPages();i++){doc.setPage(i);doc.setTextColor(150);doc.setFontSize(7);doc.text(`CHI-03 | Gilberto Flores Fabián | Página ${i} de ${doc.internal.getNumberOfPages()}`,W/2,doc.internal.pageSize.getHeight()-6,{align:'center'});}
+  
+  doc.save(`Visita_SC_${con.replace(/\s+/g,'_')}.pdf`);
+  
+  // WhatsApp
+  const waNum=document.getElementById('wa').value.replace(/\D/g,'')||'526121418717';
+  const msg=encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ ${con}\n📅 ${fec}\n📄 PDF adjunto con programa completo.\n🔗 jw.org/es | hub.jw.org`);
+  window.open(`https://wa.me/${waNum}?text=${msg}`,'_blank');
+}
+</script>
+</body>
+</html>
