@@ -1,123 +1,980 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Programa Visita SC - CHI-03</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#0066cc">
+<meta name="description" content="Programa de Visita del SC - CHI-03 2026. Herramienta oficial para organizar visitas de Superintendente de Circuito.">
+<title>Programa Visita SC - CHI-03 | v2.0</title>
+
+<!-- Librerías CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,sans-serif;background:#f5f7fa;color:#1a1a1a;line-height:1.6;padding-bottom:40px;font-size:16px}
-header{background:linear-gradient(135deg,#0066cc 0%,#003d7a 100%);color:#fff;padding:24px 20px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.1);position:relative}
-header h1{font-size:1.5rem;margin-bottom:8px;font-weight:700}
-header p{opacity:0.95;font-size:1.05rem}
-.admin-btn{position:absolute;top:20px;right:20px;background:rgba(255,255,255,.2);border:none;color:#fff;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;transition:all .2s}
-.admin-btn:hover{background:rgba(255,255,255,.35);transform:scale(1.05)}
-.container{max-width:800px;margin:24px auto;padding:0 20px}
-.card{background:#fff;border-radius:16px;padding:24px;margin-bottom:20px;box-shadow:0 4px 12px rgba(0,0,0,.08);border-left:5px solid #0066cc}
-.card h3{font-size:1.25rem;margin-bottom:16px;color:#003366;font-weight:700;display:flex;align-items:center;gap:10px}
-label{display:block;font-size:.95rem;font-weight:600;margin-bottom:6px;color:#444}
-input,select,textarea{width:100%;padding:14px;border:2px solid #e0e0e0;border-radius:10px;font-size:1rem;margin-bottom:12px;background:#fff;transition:border-color .2s;min-height:48px}
-input:focus,select:focus,textarea:focus{border-color:#0066cc;outline:none}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-.grid-5{display:grid;grid-template-columns:90px repeat(4,1fr);gap:8px;align-items:end;margin-bottom:10px;padding:12px;background:#f8f9fa;border-radius:10px}
-.grid-4{display:grid;grid-template-columns:100px repeat(3,1fr);gap:8px;align-items:end;margin-bottom:10px;padding:12px;background:#f8f9fa;border-radius:10px}
-.day{font-weight:700;font-size:1rem;color:#1a1a1a;padding-top:12px}
-.btn{width:100%;padding:18px;background:linear-gradient(135deg,#28a745 0%,#1e7e34 100%);color:#fff;border:none;border-radius:12px;font-size:1.15rem;font-weight:700;cursor:pointer;margin-top:12px;min-height:56px;transition:transform .1s,box-shadow .2s}
-.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(40,167,69,.3)}
-.btn:active{transform:translateY(0)}
-.btn-add{background:#e3f2fd;color:#0066cc;border:2px dashed #0066cc;padding:14px;width:100%;border-radius:10px;cursor:pointer;font-size:1rem;margin-top:8px;min-height:52px;font-weight:600;transition:all .2s}
-.btn-add:hover{background:#bbdefb;border-style:solid}
-.btn-maps{background:linear-gradient(135deg,#4285f4 0%,#3367d6 100%);color:#fff;border:none;padding:12px 18px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;min-height:44px;transition:transform .1s}
-.btn-maps:hover{transform:scale(1.02)}
-.btn-whatsapp{background:linear-gradient(135deg,#25d366 0%,#128c7e 100%);color:#fff;border:none;padding:12px 18px;border-radius:8px;cursor:pointer;font-size:.9rem;font-weight:600;min-height:44px;transition:transform .1s}
-.btn-whatsapp:hover{transform:scale(1.02)}
-.note{background:#fff8e1;border:2px solid #ffd54f;border-left:5px solid #ffc107;padding:18px;border-radius:0 12px 12px 0;font-size:1rem;color:#7a5c00;margin:20px 0;line-height:1.7}
-.mm{background:#e3f2fd;border-left:5px solid #0066cc;padding:20px;border-radius:0 12px 12px 0;font-size:.95rem;color:#003366;margin:20px 0;line-height:1.7}
-.mm strong{display:block;margin-bottom:6px;font-size:1.1rem;color:#003366}
-.remove{background:#ffebee;color:#c62828;border:none;padding:10px 14px;border-radius:8px;cursor:pointer;font-size:.9rem;position:absolute;right:12px;top:12px;font-weight:600;transition:all .2s}
-.remove:hover{background:#ef5350;color:#fff}
-.ubicacion-box{background:#e8f5e9;border:2px solid #4caf50;padding:18px;border-radius:12px;margin-bottom:20px}
-.ubicacion-box label{color:#2e7d32;font-size:1.05rem}
-.contacto-box{background:#fff3e0;border:2px solid #ff9800;padding:14px;border-radius:10px;margin-top:10px;font-size:.95rem;line-height:1.6}
-.maps-link{color:#1565c0;text-decoration:none;font-size:.95rem;font-weight:600;display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:8px 0;transition:color .2s}
-.maps-link:hover{color:#0d47a1;text-decoration:underline}
-.maps-link:before{content:"🗺️";font-size:1.2rem}
+:root {
+  --primary: #0066cc;
+  --primary-dark: #004a99;
+  --primary-light: #e3f2fd;
+  --accent: #00c853;
+  --accent-dark: #009624;
+  --warning: #ff9800;
+  --danger: #e53935;
+  --purple: #7c4dff;
+  --bg: #f0f2f5;
+  --surface: #ffffff;
+  --surface-2: #f8f9fa;
+  --text: #1a1a2e;
+  --text-secondary: #5a5a7a;
+  --border: #e0e0e0;
+  --shadow: 0 4px 20px rgba(0,0,0,0.08);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
 
-/* CAMPOS OCULTOS PARA HOSPEDAJE */
-.direccion-hospedaje{display:none}
-.direccion-hospedaje.visible{display:block;animation:fadeIn .3s ease}
-@keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
-.hospedaje-badge{display:inline-block;background:#4caf50;color:#fff;padding:6px 14px;border-radius:20px;font-size:.9rem;font-weight:600;margin-top:8px}
-.hospedaje-info{background:#e8f5e9;border:2px solid #4caf50;padding:12px;border-radius:10px;margin-top:10px;color:#2e7d32;font-size:.95rem}
+[data-theme="dark"] {
+  --bg: #0f1117;
+  --surface: #1a1d29;
+  --surface-2: #22263a;
+  --text: #e8eaf6;
+  --text-secondary: #9fa8da;
+  --border: #2d3142;
+  --shadow: 0 4px 20px rgba(0,0,0,0.3);
+  --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
+  --primary-light: #1a237e;
+}
 
-/* SECCIÓN ADMIN */
-.admin-section{background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%);border:3px solid #ff9800;padding:24px;border-radius:16px;margin-bottom:24px;display:none}
-.admin-section.active{display:block;animation:slideDown .3s ease}
-@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
-.admin-section h3{color:#e65100;font-size:1.3rem;margin-bottom:20px;display:flex;align-items:center;gap:10px}
-.admin-section h3:before{content:"🔐";font-size:1.4rem}
-.tema-input{background:#fff;border:2px solid #ff9800;padding:16px;border-radius:12px;margin-bottom:14px}
-.tema-input label{color:#e65100;font-size:1rem;font-weight:700}
-.tema-input input,.tema-input textarea{width:100%;padding:12px;border:2px solid #ffd54f;border-radius:8px;font-size:.95rem;margin-top:8px;margin-bottom:0;background:#fff8e1}
-.tema-input textarea{min-height:80px;resize:vertical}
-.tema-input small{display:block;margin-top:6px;color:#666;font-size:.85rem}
-.badge-admin{display:inline-block;background:#ff9800;color:#fff;padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:700;margin-left:10px}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
-/* BOTÓN DE AYUDA */
-.help-button{position:fixed;bottom:30px;right:30px;width:72px;height:72px;background:linear-gradient(135deg,#ff6b35 0%,#ff5722 100%);color:#fff;border-radius:50%;border:none;font-size:2.2rem;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,53,.4);z-index:1000;transition:all .3s;display:flex;align-items:center;justify-content:center}
-.help-button:hover{transform:scale(1.1) rotate(10deg);box-shadow:0 8px 25px rgba(255,107,53,.5)}
-.help-button.pulse{animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{box-shadow:0 6px 20px rgba(255,107,53,.4)}50%{box-shadow:0 6px 30px rgba(255,107,53,.7)}}
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  font-size: 16px;
+  padding-bottom: 100px;
+  transition: var(--transition);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,102,204,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(0,102,204,0); }
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+@keyframes toastIn {
+  from { transform: translateX(120%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes toastOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(120%); opacity: 0; }
+}
+
+.animate-in { animation: fadeInUp 0.5s ease forwards; }
+
+/* HEADER */
+header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  padding: 28px 20px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+header h1 {
+  font-size: 1.6rem;
+  margin-bottom: 6px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+header p {
+  opacity: 0.9;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.badge-version {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(10px);
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-top: 10px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* CONTROLES SUPERIORES */
+.top-controls {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 10px;
+  z-index: 100;
+}
+
+.top-btn {
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.25);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.top-btn:hover {
+  background: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+}
+
+/* CONTENEDOR */
+.container {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+/* TARJETAS */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.5s ease forwards;
+  opacity: 0;
+}
+
+.card:nth-child(1) { animation-delay: 0.05s; }
+.card:nth-child(2) { animation-delay: 0.1s; }
+.card:nth-child(3) { animation-delay: 0.15s; }
+.card:nth-child(4) { animation-delay: 0.2s; }
+.card:nth-child(5) { animation-delay: 0.25s; }
+.card:nth-child(6) { animation-delay: 0.3s; }
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-accent { border-left: 5px solid var(--primary); }
+.card-green { border-left-color: var(--accent); }
+.card-purple { border-left-color: var(--purple); }
+.card-orange { border-left-color: var(--warning); }
+.card-red { border-left-color: var(--danger); }
+
+.card h3 {
+  font-size: 1.2rem;
+  margin-bottom: 18px;
+  color: var(--primary);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card-green h3 { color: var(--accent-dark); }
+.card-purple h3 { color: var(--purple); }
+.card-orange h3 { color: #e65100; }
+
+/* FORMULARIOS */
+label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-secondary);
+  transition: var(--transition);
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  margin-bottom: 14px;
+  background: var(--surface);
+  color: var(--text);
+  transition: var(--transition);
+  font-family: var(--font);
+  min-height: 48px;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--primary);
+  outline: none;
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+input.valid { border-color: var(--accent); }
+input.invalid { border-color: var(--danger); animation: shake 0.4s ease; }
+
+textarea { resize: vertical; min-height: 80px; }
+
+select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  padding-right: 40px;
+}
+
+.small-text {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  display: block;
+  margin-top: -10px;
+  margin-bottom: 12px;
+}
+
+/* GRIDS */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.grid-5 {
+  display: grid;
+  grid-template-columns: 90px repeat(4, 1fr);
+  gap: 8px;
+  align-items: end;
+  margin-bottom: 10px;
+  padding: 14px;
+  background: var(--surface-2);
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+}
+.grid-5:hover { background: var(--primary-light); }
+
+.day {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text);
+  padding-top: 28px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* BOTONES */
+.btn {
+  width: 100%;
+  padding: 18px;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
+  min-height: 56px;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::after {
+  width: 300px;
+  height: 300px;
+}
+
+.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0,200,83,0.35);
+}
+
+.btn:active { transform: translateY(-1px); }
+
+.btn-secondary {
+  background: linear-gradient(135deg, var(--warning) 0%, #f57c00 100%);
+}
+
+.btn-secondary:hover {
+  box-shadow: 0 8px 25px rgba(255,152,0,0.35);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px dashed var(--primary);
+  color: var(--primary);
+}
+
+.btn-outline:hover {
+  background: var(--primary-light);
+  border-style: solid;
+}
+
+.btn-sm {
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  min-height: 42px;
+  border-radius: 10px;
+  width: auto;
+  display: inline-flex;
+}
+
+.btn-maps {
+  background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-maps:hover { transform: scale(1.03); box-shadow: 0 4px 15px rgba(66,133,244,0.3); }
+
+.btn-whatsapp {
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn-whatsapp:hover { transform: scale(1.03); }
+
+.btn-remove {
+  background: #ffebee;
+  color: var(--danger);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: var(--transition);
+  position: absolute;
+  top: 14px;
+  right: 14px;
+}
+
+.btn-remove:hover { background: var(--danger); color: #fff; }
+
+/* SECCIONES ESPECIALES */
+.ubicacion-box {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  border: 2px solid var(--accent);
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+}
+
+[data-theme="dark"] .ubicacion-box {
+  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+  border-color: var(--accent);
+}
+
+.contacto-box {
+  background: var(--primary-light);
+  border: 2px solid var(--primary);
+  padding: 14px;
+  border-radius: 10px;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.note {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border: 2px solid #ffd54f;
+  border-left: 5px solid var(--warning);
+  padding: 20px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.95rem;
+  color: #7a5c00;
+  margin: 20px 0;
+  line-height: 1.7;
+}
+
+[data-theme="dark"] .note {
+  background: linear-gradient(135deg, #3e2723 0%, #4e342e 100%);
+  color: #ffe0b2;
+  border-color: #ff9800;
+}
+
+.mm {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #bbdefb 100%);
+  border-left: 5px solid var(--primary);
+  padding: 22px;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.92rem;
+  color: var(--primary-dark);
+  margin: 20px 0;
+  line-height: 1.7;
+}
+
+[data-theme="dark"] .mm {
+  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+  color: #c5cae9;
+}
+
+.mm strong { display: block; margin-bottom: 6px; font-size: 1.05rem; color: var(--primary-dark); }
+
+.direccion-hospedaje { display: none; }
+.direccion-hospedaje.visible { display: block; animation: fadeIn 0.3s ease; }
+
+.hospedaje-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 8px;
+}
+
+/* ADMIN */
+.admin-section {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  border: 3px solid var(--warning);
+  padding: 24px;
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+  display: none;
+  animation: slideDown 0.3s ease;
+}
+
+[data-theme="dark"] .admin-section {
+  background: linear-gradient(135deg, #3e2723 0%, #4e342e 100%);
+}
+
+.admin-section.active { display: block; }
+
+.admin-section h3 {
+  color: #e65100;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tema-input {
+  background: var(--surface);
+  border: 2px solid var(--warning);
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 14px;
+}
+
+.tema-input label { color: #e65100; font-size: 0.95rem; font-weight: 700; }
+
+.tema-input input, .tema-input textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ffd54f;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  margin-top: 8px;
+  background: #fff8e1;
+  color: var(--text);
+}
+
+.tema-input textarea { min-height: 70px; resize: vertical; }
+
+.tema-input small { display: block; margin-top: 6px; color: var(--text-secondary); font-size: 0.8rem; }
+
+.badge-admin {
+  display: inline-block;
+  background: var(--warning);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-left: 10px;
+}
+
+.maps-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 8px 0;
+  transition: var(--transition);
+}
+
+.maps-link:hover { color: var(--primary-dark); text-decoration: underline; }
+
+/* TIMELINE */
+.timeline {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  position: relative;
+  padding: 0 10px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  z-index: 0;
+}
+
+.timeline-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  z-index: 1;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.timeline-dot {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 3px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  transition: var(--transition);
+}
+
+.timeline-item:hover .timeline-dot { transform: scale(1.15); border-color: var(--primary); }
+.timeline-item.active .timeline-dot { background: var(--primary); border-color: var(--primary); color: #fff; }
+.timeline-item.completed .timeline-dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.timeline-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-align: center; }
+
+/* PROGRESO */
+.progress-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: rgba(0,0,0,0.1);
+  z-index: 9999;
+}
+
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--accent));
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+.progress-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--surface);
+  padding: 14px 18px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 20px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.progress-stats-text { font-weight: 700; color: var(--primary); font-size: 0.95rem; }
+.progress-stats-sub { font-size: 0.8rem; color: var(--text-secondary); }
+
+/* TOAST */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 360px;
+}
+
+.toast {
+  background: var(--surface);
+  border-left: 4px solid var(--primary);
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: toastIn 0.4s ease forwards;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.toast.success { border-left-color: var(--accent); }
+.toast.error { border-left-color: var(--danger); }
+.toast.warning { border-left-color: var(--warning); }
+
+.toast-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  padding: 0 4px;
+}
 
 /* MODALES */
-.help-overlay,.password-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);display:none;z-index:1001;backdrop-filter:blur(4px)}
-.help-modal,.password-modal{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:#fff;width:92%;max-width:750px;max-height:90vh;overflow-y:auto;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.3);z-index:1002;display:none}
-.password-modal{max-width:400px;padding:32px;text-align:center}
-.password-modal h3{color:#e65100;font-size:1.4rem;margin-bottom:20px}
-.password-modal input{width:100%;padding:16px;border:3px solid #ff9800;border-radius:12px;font-size:1.2rem;text-align:center;margin-bottom:16px;letter-spacing:2px}
-.password-modal .btn-admin{background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%);color:#fff;border:none;padding:16px;width:100%;border-radius:12px;font-size:1.1rem;font-weight:700;cursor:pointer;margin-top:8px}
-.password-modal .error{color:#c62828;font-size:.95rem;margin-top:12px;display:none}
-.password-modal .hint{color:#666;font-size:.85rem;margin-top:16px;font-style:italic}
-
-.progress-indicator{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,#0066cc,#00c853);transition:width .3s;z-index:9999}
-
-@media(max-width:680px){
-  .grid-5,.grid-4,.grid-2,.grid-3{grid-template-columns:1fr}
-  .day{background:#e8e8e8;padding:10px;border-radius:8px;margin-bottom:8px}
-  .help-button{width:64px;height:64px;font-size:2rem;bottom:20px;right:20px}
-  .help-modal,.password-modal{width:95%;max-height:95vh}
-  body{font-size:15px}
-  .card{padding:18px}
-  header h1{font-size:1.3rem}
-  .admin-btn{top:10px;right:10px;padding:8px 12px;font-size:.8rem}
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  z-index: 1001;
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
+
+.modal-overlay.active { display: flex; opacity: 1; }
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  background: var(--surface);
+  width: 92%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  z-index: 1002;
+  display: none;
+  opacity: 0;
+  transition: all 0.3s ease;
+  border: 1px solid var(--border);
+}
+
+.modal.active { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+.modal-header {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: #fff;
+  padding: 24px;
+  border-radius: var(--radius) var(--radius) 0 0;
+  text-align: center;
+  position: relative;
+}
+
+.modal-header h2 { margin: 0; font-size: 1.4rem; }
+
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: rgba(255,255,255,0.2);
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.modal-close:hover { background: rgba(255,255,255,0.35); transform: rotate(90deg); }
+
+.modal-body { padding: 24px; }
+
+.password-modal { max-width: 420px; padding: 32px; text-align: center; }
+
+.password-modal h3 { color: #e65100; font-size: 1.4rem; margin-bottom: 20px; }
+
+.password-modal input {
+  width: 100%;
+  padding: 16px;
+  border: 3px solid var(--warning);
+  border-radius: 12px;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 16px;
+  letter-spacing: 3px;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.password-modal .hint { color: var(--text-secondary); font-size: 0.85rem; margin-top: 16px; font-style: italic; }
+
+/* LOADING */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  display: none;
+  z-index: 2000;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.loading-overlay.active { display: flex; }
+
+.spinner {
+  width: 64px;
+  height: 64px;
+  border: 5px solid var(--border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading-text {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 1.15rem;
+  text-align: center;
+}
+
+.loading-sub {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* CHECKLIST */
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: var(--surface-2);
+  border-radius: 10px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: var(--transition);
+  border: 2px solid transparent;
+}
+
+.checklist-item:hover { border-color: var(--primary); }
+
+.checklist-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary); cursor: pointer; }
+
+.checklist-item.checked { opacity: 0.6; text-decoration: line-through; }
+
+/* RESPONSIVE */
+@media (max-width: 680px) {
+  .grid-5, .grid-4, .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .day { background: var(--surface-2); padding: 10px; border-radius: 8px; margin-bottom: 8px; }
+  .timeline { overflow-x: auto; gap: 20px; padding-bottom: 10px; }
+  .timeline::before { display: none; }
+  body { font-size: 15px; }
+  .card { padding: 18px; }
+  header h1 { font-size: 1.3rem; }
+  .top-controls { top: 10px; right: 10px; }
+  .top-btn { padding: 8px 12px; font-size: 0.8rem; }
+  .modal { width: 95%; max-height: 95vh; }
+}
+
+/* UTILIDADES */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.gap-2 { gap: 8px; }
+.gap-4 { gap: 16px; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.mt-2 { margin-top: 8px; }
+.mt-4 { margin-top: 16px; }
+.mb-2 { margin-bottom: 8px; }
+.text-center { text-align: center; }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.font-bold { font-weight: 700; }
+.w-full { width: 100%; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+::selection { background: var(--primary-light); color: var(--primary-dark); }
 </style>
 </head>
+
 <body>
 
-<div class="progress-indicator" id="progressBar" style="width:0%"></div>
+<div class="progress-container">
+  <div class="progress-bar" id="progressBar"></div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text">Generando PDF profesional...</div>
+  <div class="loading-sub">Esto solo tomará unos segundos</div>
+</div>
 
 <header>
+  <div class="top-controls">
+    <button class="top-btn" onclick="toggleTheme()" title="Cambiar tema">🌓 Tema</button>
+    <button class="top-btn" onclick="mostrarLoginAdmin()" title="Administrador">🔐 Admin</button>
+  </div>
   <h1>📋 Programa de Visita del SC</h1>
   <p>CHI-03 • Marzo a Agosto 2026</p>
-  <button class="admin-btn" onclick="mostrarLoginAdmin()">🔐 Admin</button>
+  <span class="badge-version">✨ Versión 2.0 Mejorada</span>
 </header>
 
 <div class="container">
-  
-  <!-- SECCIÓN ADMIN -->
+
+  <div class="progress-stats animate-in">
+    <div>
+      <div class="progress-stats-text" id="progressText">0% Completado</div>
+      <div class="progress-stats-sub">Complete los campos obligatorios marcados con *</div>
+    </div>
+    <div style="text-align:right">
+      <div class="progress-stats-text" id="fieldsCount">0/0 campos</div>
+      <div class="progress-stats-sub">Guardado automático activado 💾</div>
+    </div>
+  </div>
+
+  <div class="card animate-in">
+    <h3>📅 Línea de Tiempo de la Visita</h3>
+    <div class="timeline" id="timelineVis">
+      <div class="timeline-item" data-day="0">
+        <div class="timeline-dot">🛬</div>
+        <div class="timeline-label">Llegada</div>
+      </div>
+      <div class="timeline-item" data-day="1">
+        <div class="timeline-dot">📖</div>
+        <div class="timeline-label">Martes</div>
+      </div>
+      <div class="timeline-item" data-day="2">
+        <div class="timeline-dot">🙋</div>
+        <div class="timeline-label">Miércoles</div>
+      </div>
+      <div class="timeline-item" data-day="3">
+        <div class="timeline-dot">📢</div>
+        <div class="timeline-label">Jueves</div>
+      </div>
+      <div class="timeline-item" data-day="4">
+        <div class="timeline-dot">👔</div>
+        <div class="timeline-label">Viernes</div>
+      </div>
+      <div class="timeline-item" data-day="5">
+        <div class="timeline-dot">🎤</div>
+        <div class="timeline-label">Sábado</div>
+      </div>
+      <div class="timeline-item" data-day="6">
+        <div class="timeline-dot">✈️</div>
+        <div class="timeline-label">Salida</div>
+      </div>
+    </div>
+  </div>
+
   <div class="admin-section" id="adminSection">
-    <h3>Configuración de Temas de Discursos <span class="badge-admin">MODO ADMIN</span></h3>
-    <p style="margin-bottom:16px;color:#666;font-size:.95rem">Estos temas aparecerán en el PDF generado. Modifíquelos según las indicaciones del SC.</p>
+    <h3>🔐 Configuración de Temas de Discursos <span class="badge-admin">MODO ADMIN</span></h3>
+    <p style="margin-bottom:16px;color:var(--text-secondary);font-size:0.9rem">Estos temas aparecerán en el PDF generado. Modifíquelos según las indicaciones del SC.</p>
     
     <div class="tema-input">
       <label>Martes - 1er Discurso</label>
       <textarea id="tema_martes">¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?</textarea>
-      <small>Canción 76</small>
+      <small>🎵 Canción 76</small>
     </div>
     
     <div class="tema-input">
@@ -133,171 +990,221 @@ input:focus,select:focus,textarea:focus{border-color:#0066cc;outline:none}
     <div class="tema-input">
       <label>Sábado/Domingo - Discurso Público</label>
       <textarea id="tema_sabado">CÓMO COSECHAR VIDA ETERNA</textarea>
-      <small>Canción 145</small>
+      <small>🎵 Canción 145</small>
     </div>
     
     <div class="tema-input">
       <label>2do Discurso - Servicio</label>
       <textarea id="tema_2do">"JEHOVÁ NO RETENDRÁ NADA BUENO..."</textarea>
-      <small>Canción 155</small>
+      <small>🎵 Canción 155</small>
     </div>
     
     <div class="grid-2" style="margin-top:20px">
-      <button type="button" class="btn" onclick="guardarTemas()" style="background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%)">💾 Guardar Cambios</button>
-      <button type="button" class="btn" onclick="restaurarTemas()" style="background:#757575">↩️ Restaurar Originales</button>
+      <button type="button" class="btn btn-secondary" onclick="guardarTemas()">💾 Guardar Cambios</button>
+      <button type="button" class="btn" style="background:#757575" onclick="restaurarTemas()">↩️ Restaurar Originales</button>
     </div>
-    
-    <div class="success-box" id="guardadoMsg" style="display:none;margin-top:16px;background:#e8f5e9;border:2px solid #4caf50;padding:14px;border-radius:10px;color:#2e7d32">
-      ✅ ¡Temas guardados correctamente! Se aplicarán al generar el PDF.
-    </div>
+  </div>
+
+  <div class="flex gap-2" style="margin-bottom:16px;flex-wrap:wrap">
+    <button class="btn btn-sm btn-outline" onclick="exportarDatos()">📤 Exportar Datos</button>
+    <button class="btn btn-sm btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar Datos</button>
+    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importarDatos(this)">
+    <button class="btn btn-sm btn-outline" onclick="limpiarFormulario()">🧹 Limpiar Todo</button>
   </div>
 
   <form id="f">
     
-    <!-- UBICACIÓN DEL SC -->
-    <div class="card" style="border-left-color:#4caf50">
-      <h3 style="color:#2e7d32">📍 Ubicación del SC (Hospedaje)</h3>
+    <div class="card card-green animate-in">
+      <h3>📍 Ubicación del SC (Hospedaje)</h3>
       <div class="ubicacion-box">
         <div class="grid-2">
           <div>
             <label>Dirección del Hospedaje *</label>
-            <input id="sc_direccion" required placeholder="Ej. Calle Principal 123, Colonia Centro, Ciudad Juárez">
+            <input id="sc_direccion" required placeholder="Ej. Calle Principal 123, Colonia Centro, Ciudad Juárez" oninput="actualizarPreviewMaps('sc_direccion','preview_sc')">
+            <div id="preview_sc" style="margin-top:4px"></div>
           </div>
           <div>
             <label>Teléfono de Contacto Local *</label>
             <input id="sc_telefono" required placeholder="Ej. 656 123 4567">
           </div>
         </div>
-        <div style="margin-top:12px">
-          <button type="button" class="btn-maps" onclick="abrirMaps('sc_direccion')" style="width:100%;font-size:1.05rem">🗺️ Ver en Google Maps</button>
+        <div class="mt-2">
+          <button type="button" class="btn-maps" onclick="abrirMaps('sc_direccion')" style="width:100%">🗺️ Ver en Google Maps</button>
         </div>
       </div>
     </div>
 
-    <!-- CONFIGURACIÓN -->
-    <div class="card">
-      <h3>⚙️ Configuración</h3>
+    <div class="card card-accent animate-in">
+      <h3>⚙️ Configuración General</h3>
       <div class="grid-2">
         <div><label>Congregación *</label><input id="cong" required placeholder="Ej. Juárez Centro"></div>
-        <div><label>Fechas *</label><input id="fec" required placeholder="Ej. 15/03 al 20/03"></div>
+        <div><label>Fechas de Visita *</label><input id="fec" required placeholder="Ej. 15/03 al 20/03"></div>
       </div>
-      <label style="margin-top:12px">📱 Número de WhatsApp del SC (con código de país, sin +)</label>
+      <label class="mt-2">📱 WhatsApp del SC (código país, sin +)</label>
       <input id="wa" value="526121418717" placeholder="Ej. 526121418717">
-      <small style="color:#666;font-size:.95rem;display:block;margin-top:6px">Ejemplo: México = 52 + 10 dígitos</small>
+      <small class="small-text">💡 Formato: México = 52 + número de 10 dígitos</small>
     </div>
 
-    <!-- REUNIONES -->
-    <div class="card">
-      <h3>📅 REUNIONES</h3>
+    <div class="card animate-in">
+      <h3>✅ Checklist de Preparación</h3>
+      <div id="checklist">
+        <label class="checklist-item" onclick="toggleChecklist(this)">
+          <input type="checkbox"> <span>Confirmar hospedaje del SC</span>
+        </label>
+        <label class="checklist-item" onclick="toggleChecklist(this)">
+          <input type="checkbox"> <span>Verificar horarios del Salón del Reino</span>
+        </label>
+        <label class="checklist-item" onclick="toggleChecklist(this)">
+          <input type="checkbox"> <span>Coordinar alimentos (desde miércoles)</span>
+        </label>
+        <label class="checklist-item" onclick="toggleChecklist(this)">
+          <input type="checkbox"> <span>Preparar multimedia (JW Hub)</span>
+        </label>
+        <label class="checklist-item" onclick="toggleChecklist(this)">
+          <input type="checkbox"> <span>Confirmar hermanos para predicar con el SC</span>
+        </label>
+        <label class="checklist-item" onclick="toggleChecklist(this)">
+          <input type="checkbox"> <span>Revisar que no haya cruces de horarios</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card animate-in">
+      <h3>📅 REUNIONES PROGRAMADAS</h3>
       
-      <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #eee">
-        <div class="day">Martes</div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>HORA</label><input type="time" id="r1h"></div>
-          <div><label>LUGAR</label><input id="r1l" value="SALÓN DEL REINO"></div>
+      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:2px solid var(--border)">
+        <div class="day">📖 Martes - 1er Discurso</div>
+        <div class="grid-2 mt-2">
+          <div><label>Hora</label><input type="time" id="r1h"></div>
+          <div><label>Lugar</label><input id="r1l" value="SALÓN DEL REINO"></div>
         </div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>DIRECCIÓN</label><input id="r1d" placeholder="Dirección completa del salón"></div>
-          <div><label>TELÉFONO</label><input id="r1t" placeholder="Contacto del salón"></div>
+        <div class="grid-2 mt-2">
+          <div>
+            <label>Dirección</label>
+            <input id="r1d" placeholder="Dirección completa del salón" oninput="actualizarPreviewMaps('r1d','link_r1d')">
+            <div id="link_r1d"></div>
+          </div>
+          <div><label>Teléfono</label><input id="r1t" placeholder="Contacto del salón"></div>
         </div>
-        <div id="link_r1d" style="margin-top:8px"></div>
       </div>
       
-      <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #eee">
+      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:2px solid var(--border)">
         <div class="grid-2">
-          <div class="day">Mié / Sábado</div>
-          <div><label>DÍA</label><select id="r2d"><option>Miércoles</option><option>Sábado</option></select></div>
+          <div class="day">🙋 Miércoles / Sábado</div>
+          <div><label>Día seleccionado</label><select id="r2d"><option>Miércoles</option><option>Sábado</option></select></div>
         </div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>HORA</label><input type="time" id="r2h"></div>
-          <div><label>LUGAR</label><input id="r2l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
+        <div class="grid-2 mt-2">
+          <div><label>Hora</label><input type="time" id="r2h"></div>
+          <div><label>Lugar</label><input id="r2l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
         </div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>DIRECCIÓN</label><input id="r2d_dir" placeholder="Dirección del lugar"></div>
-          <div><label>TELÉFONO</label><input id="r2t" placeholder="Contacto"></div>
+        <div class="grid-2 mt-2">
+          <div>
+            <label>Dirección</label>
+            <input id="r2d_dir" placeholder="Dirección del lugar" oninput="actualizarPreviewMaps('r2d_dir','link_r2d_dir')">
+            <div id="link_r2d_dir"></div>
+          </div>
+          <div><label>Teléfono</label><input id="r2t" placeholder="Contacto"></div>
         </div>
-        <div id="link_r2d_dir" style="margin-top:8px"></div>
       </div>
       
-      <div style="margin-bottom:16px;padding-bottom:14px;border-bottom:2px solid #eee">
-        <div class="day">Viernes</div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>HORA</label><input type="time" id="r3h"></div>
-          <div><label>LUGAR</label><input id="r3l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
+      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:2px solid var(--border)">
+        <div class="day">👔 Viernes - Ancianos y SM</div>
+        <div class="grid-2 mt-2">
+          <div><label>Hora</label><input type="time" id="r3h"></div>
+          <div><label>Lugar</label><input id="r3l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
         </div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>DIRECCIÓN</label><input id="r3d" placeholder="Dirección del lugar"></div>
-          <div><label>TELÉFONO</label><input id="r3t" placeholder="Contacto"></div>
+        <div class="grid-2 mt-2">
+          <div>
+            <label>Dirección</label>
+            <input id="r3d" placeholder="Dirección del lugar" oninput="actualizarPreviewMaps('r3d','link_r3d')">
+            <div id="link_r3d"></div>
+          </div>
+          <div><label>Teléfono</label><input id="r3t" placeholder="Contacto"></div>
         </div>
-        <div id="link_r3d" style="margin-top:8px"></div>
       </div>
       
       <div>
         <div class="grid-2">
-          <div class="day">Sáb / Domingo</div>
-          <div><label>DÍA</label><select id="r4d"><option>Sábado</option><option>Domingo</option></select></div>
+          <div class="day">🎤 Sábado / Domingo</div>
+          <div><label>Día seleccionado</label><select id="r4d"><option>Sábado</option><option>Domingo</option></select></div>
         </div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>HORA</label><input type="time" id="r4h"></div>
-          <div><label>LUGAR</label><input id="r4l" value="SALÓN DEL REINO"></div>
+        <div class="grid-2 mt-2">
+          <div><label>Hora</label><input type="time" id="r4h"></div>
+          <div><label>Lugar</label><input id="r4l" value="SALÓN DEL REINO"></div>
         </div>
-        <div class="grid-2" style="margin-top:10px">
-          <div><label>DIRECCIÓN</label><input id="r4d_dir" placeholder="Dirección del salón"></div>
-          <div><label>TELÉFONO</label><input id="r4t" placeholder="Contacto del salón"></div>
+        <div class="grid-2 mt-2">
+          <div>
+            <label>Dirección</label>
+            <input id="r4d_dir" placeholder="Dirección del salón" oninput="actualizarPreviewMaps('r4d_dir','link_r4d_dir')">
+            <div id="link_r4d_dir"></div>
+          </div>
+          <div><label>Teléfono</label><input id="r4t" placeholder="Contacto del salón"></div>
         </div>
-        <div id="link_r4d_dir" style="margin-top:8px"></div>
       </div>
       
-      <small style="color:#666;display:block;margin-top:12px;font-size:.95rem;background:#f5f5f5;padding:10px;border-radius:8px">⚠️ Según tenga la reunión cada congregación - NO HAGA CAMBIOS sin consultar</small>
+      <div class="note mt-4">
+        <strong>⚠️ Importante:</strong> Según tenga la reunión cada congregación — <strong>NO HAGA CAMBIOS sin consultar al SC.</strong>
+      </div>
     </div>
 
-    <!-- PREDICACIÓN GENERAL -->
-    <div class="card">
-      <h3>📢 PREDICACIÓN</h3>
+    <div class="card animate-in">
+      <h3>📢 PREDICACIÓN GENERAL</h3>
       <div id="pg"></div>
     </div>
 
-    <!-- CON EL SC -->
-    <div class="card" style="border-left-color:#28a745">
-      <h3 style="color:#28a745">👤 CON EL SC</h3>
+    <div class="card card-green animate-in">
+      <h3>👤 CON EL SC</h3>
       <div id="sc"></div>
     </div>
 
-    <!-- CON LA ESPOSA -->
-    <div class="card" style="border-left-color:#9333ea">
-      <h3 style="color:#9333ea">👩 CON LA ESPOSA DEL SC</h3>
+    <div class="card card-purple animate-in">
+      <h3>👩 CON LA ESPOSA DEL SC</h3>
       <div id="sp"></div>
     </div>
 
-    <!-- ALIMENTOS CON LÓGICA DE HOSPEDAJE -->
-    <div class="card">
+    <div class="card card-orange animate-in">
       <h3>🍽️ ALIMENTOS</h3>
       <div id="al"></div>
-      <small style="color:#666;font-size:.95rem;display:block;margin-top:10px;background:#f5f5f5;padding:10px;border-radius:8px">💡 Escriba "En el hospedaje" y los campos de dirección se ocultarán automáticamente</small>
+      <div class="note" style="margin-top:14px;margin-bottom:0">
+        💡 <strong>Tip inteligente:</strong> Escriba <em>"En el hospedaje"</em> en el campo de lugar y los campos de dirección se ocultarán automáticamente.
+      </div>
     </div>
 
-    <!-- VISITAS -->
-    <div class="card">
+    <div class="card animate-in">
       <h3>🏠 VISITAS DE PASTOREO</h3>
       <div id="vis"></div>
-      <button type="button" class="btn-add" onclick="addVis()">➕ Agregar visita</button>
+      <button type="button" class="btn btn-outline" onclick="addVis()" style="margin-top:8px">➕ Agregar nueva visita</button>
     </div>
 
-    <!-- AGENDA -->
-    <div class="card">
+    <div class="card animate-in">
       <h3>📋 ASUNTOS PARA LA REUNIÓN CON ANCIANOS</h3>
-      <label>1.</label><textarea id="ag1" rows="2" placeholder="Escriba el primer asunto a tratar..."></textarea>
-      <label>2.</label><textarea id="ag2" rows="2" placeholder="Escriba el segundo asunto a tratar..."></textarea>
-      <label>3.</label><textarea id="ag3" rows="2" placeholder="Escriba el tercer asunto a tratar..."></textarea>
+      <label>1.</label><textarea id="ag1" rows="2" placeholder="Primer asunto a tratar..."></textarea>
+      <label>2.</label><textarea id="ag2" rows="2" placeholder="Segundo asunto a tratar..."></textarea>
+      <label>3.</label><textarea id="ag3" rows="2" placeholder="Tercer asunto a tratar..."></textarea>
     </div>
 
   </form>
 
-  <button class="btn" onclick="gen()">📄 GENERAR PDF Y ENVIAR POR WHATSAPP</button>
-  
-  <button class="btn" onclick="enviarResumenUbicaciones()" style="background:linear-gradient(135deg,#ff9800 0%,#f57c00 100%);margin-top:14px">📱 ENVIAR RESUMEN DE UBICACIONES AL SC</button>
+  <div style="display:grid;gap:12px;margin:24px 0">
+    <button class="btn" onclick="gen()">
+      <span>📄</span> GENERAR PDF Y ENVIAR POR WHATSAPP
+    </button>
+    
+    <button class="btn btn-secondary" onclick="enviarResumenUbicaciones()">
+      <span>📱</span> ENVIAR RESUMEN DE UBICACIONES AL SC
+    </button>
+    
+    <div class="grid-2">
+      <button class="btn btn-outline" onclick="soloPDF()">
+        <span>💾</span> Solo Descargar PDF
+      </button>
+      <button class="btn btn-outline" onclick="soloWhatsApp()">
+        <span>💬</span> Solo Enviar WhatsApp
+      </button>
+    </div>
+  </div>
 
-  <div class="mm">
+  <div class="mm animate-in">
     <strong>📁 MULTIMEDIA JW Hub (CHI-03)</strong>
     <em>Gilberto Flores Fabián • Actualización 7 de abril de 2026</em><br><br>
     <strong>DISCURSO DEL MARTES:</strong> 3 videos en JW Hub → Documentos → Archivos multimedia<br>
@@ -310,108 +1217,106 @@ input:focus,select:focus,textarea:focus{border-color:#0066cc;outline:none}
     <strong>P.D. CCA:</strong> Descargar archivos con anticipación
   </div>
 
-  <div class="note">
+  <div class="note animate-in">
     <strong>📌 NOTA IMPORTANTE:</strong> Esta página no se debe pegar en el tablero de información.<br>
     • Revisen que no se crucen horarios • Alimentos desde miércoles<br>
     ✓ Domingo: análisis de informe con Comité de Servicio
   </div>
 </div>
 
-<!-- BOTÓN DE AYUDA -->
-<button class="help-button pulse" onclick="abrirAyuda()" title="¿Necesita ayuda?">❓</button>
+<button class="help-button" onclick="abrirAyuda()" title="¿Necesita ayuda?" style="position:fixed;bottom:28px;right:28px;width:64px;height:64px;background:linear-gradient(135deg,#ff6b35,#ff5722);color:#fff;border-radius:50%;border:none;font-size:1.8rem;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,53,0.4);z-index:1000;transition:all 0.3s;display:flex;align-items:center;justify-content:center;">
+  ❓
+</button>
 
-<!-- MODAL DE AYUDA -->
-<div class="help-overlay" id="helpOverlay" onclick="cerrarAyuda()"></div>
-<div class="help-modal" id="helpModal">
-  <div class="help-header" style="background:linear-gradient(135deg,#ff6b35 0%,#ff5722 100%);color:#fff;padding:24px;border-radius:20px 20px 0 0;text-align:center;position:relative">
-    <h2 style="margin:0;font-size:1.6rem">❓ Centro de Ayuda</h2>
-    <button style="position:absolute;top:20px;right:24px;background:rgba(255,255,255,.25);border:none;color:#fff;font-size:2rem;cursor:pointer;width:44px;height:44px;border-radius:50%" onclick="cerrarAyuda()">×</button>
+<div class="modal-overlay" id="helpOverlay" onclick="cerrarAyuda()"></div>
+<div class="modal" id="helpModal" style="max-width:800px">
+  <div class="modal-header" style="background:linear-gradient(135deg,#ff6b35,#ff5722)">
+    <h2>❓ Centro de Ayuda</h2>
+    <button class="modal-close" onclick="cerrarAyuda()">×</button>
   </div>
-  <div style="padding:28px">
-    <div style="display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;justify-content:center">
-      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('inicio', this)">🏠 Inicio</button>
-      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('primeravez', this)">🆕 Primera vez</button>
-      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('pasoapaso', this)">📝 Paso a paso</button>
-      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('problemas', this)">🔧 Problemas</button>
-      <button style="flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600" onclick="mostrarSeccionAyuda('faq', this)">❓ Preguntas</button>
+  <div class="modal-body">
+    <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;justify-content:center">
+      <button class="btn btn-sm" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('inicio', this)">🏠 Inicio</button>
+      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('primeravez', this)">🆕 Primera vez</button>
+      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('pasoapaso', this)">📝 Paso a paso</button>
+      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('problemas', this)">🔧 Problemas</button>
+      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('faq', this)">❓ FAQ</button>
     </div>
     
     <div id="ayuda-inicio">
-      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">👋 Bienvenido</h3>
-      <p style="line-height:1.8;margin-bottom:16px">Esta herramienta organiza la visita del SC a su congregación. Está diseñada para ser <strong>fácil de usar</strong>, incluso sin experiencia tecnológica.</p>
-      <div style="background:#e8f5e9;border:2px solid #66bb6a;padding:18px;border-radius:12px;margin:16px 0;color:#2e7d32">
-        💡 <strong>¿Por dónde empezar?</strong> Toque <strong>"Primera vez"</strong> arriba para ver la guía paso a paso.
+      <h3 style="color:var(--primary);margin-bottom:16px">👋 Bienvenido a la versión 2.0</h3>
+      <p style="line-height:1.8;margin-bottom:16px">Esta herramienta organiza la visita del SC a su congregación. Ahora con <strong>guardado automático</strong>, <strong>modo oscuro</strong>, <strong>exportación de datos</strong> y mucho más.</p>
+      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;border-radius:0 10px 10px 0;margin:14px 0">
+        💡 <strong>¿Nuevo aquí?</strong> Toque <strong>"Primera vez"</strong> arriba para la guía completa.
       </div>
     </div>
     
     <div id="ayuda-primeravez" style="display:none">
-      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">🆕 Guía para Usuarios Nuevos</h3>
-      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
-        <strong>PASO 1:</strong> Complete <strong>"📍 Ubicación del SC"</strong> con dirección y teléfono del hospedaje.
+      <h3 style="color:var(--primary);margin-bottom:16px">🆕 Guía para Usuarios Nuevos</h3>
+      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
+        <strong>PASO 1:</strong> Complete <strong>"📍 Ubicación del SC"</strong> con dirección y teléfono.
       </div>
-      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
         <strong>PASO 2:</strong> En <strong>"⚙️ Configuración"</strong> escriba congregación y fechas.
       </div>
-      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
         <strong>PASO 3:</strong> Llene <strong>"📅 REUNIONES"</strong> con horarios y lugares.
       </div>
-      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
+      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
         <strong>PASO 4:</strong> Complete <strong>"🍽️ ALIMENTOS"</strong>. Escriba "En el hospedaje" para ocultar dirección.
       </div>
-      <div style="background:#e3f2fd;border-left:5px solid #2196f3;padding:16px;margin:14px 0;border-radius:0 10px 10px 0">
-        <strong>PASO 5:</strong> Toque <strong>"📄 GENERAR PDF"</strong> para crear el documento oficial.
+      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
+        <strong>PASO 5:</strong> Toque <strong>"📄 GENERAR PDF"</strong>. ¡Listo!
       </div>
     </div>
     
     <div id="ayuda-pasoapaso" style="display:none">
-      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">📝 Instrucciones Detalladas</h3>
-      <h4 style="margin:20px 0 12px">📍 Direcciones correctas:</h4>
-      <ul style="margin-left:24px;line-height:1.8">
-        <li>✅ <strong>Bien:</strong> "Calle Juárez 123, Centro, Ciudad Juárez"</li>
-        <li>❌ <strong>Evite:</strong> "Casa de hermano García" (sin calle)</li>
+      <h3 style="color:var(--primary);margin-bottom:16px">📝 Consejos Profesionales</h3>
+      <ul style="margin-left:24px;line-height:2">
+        <li>✅ Use direcciones completas: "Calle Juárez 123, Centro, Ciudad Juárez"</li>
+        <li>✅ El guardado automático funciona cada 3 segundos</li>
+        <li>✅ Exporte sus datos como respaldo antes de cerrar</li>
+        <li>✅ Use el modo oscuro para trabajar de noche</li>
+        <li>✅ Revise el checklist antes de generar el PDF</li>
       </ul>
-      <h4 style="margin:20px 0 12px">🍽️ Alimentos en hospedaje:</h4>
-      <p style="line-height:1.8">Escriba <strong>"En el hospedaje"</strong> en el campo de lugar y los campos de dirección se ocultarán automáticamente. Esto evita llenar información innecesaria.</p>
     </div>
     
     <div id="ayuda-problemas" style="display:none">
-      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">🔧 Solución de Problemas</h3>
-      <p style="margin-bottom:12px"><strong>❌ "No se pudo generar el PDF"</strong></p>
-      <p style="margin-bottom:16px;color:#666">Espere 10-20 segundos tras abrir la página. Recargue si persiste (F5 en PC).</p>
-      <p style="margin-bottom:12px"><strong>❌ "No aparece el enlace de Maps"</strong></p>
-      <p style="margin-bottom:16px;color:#666">Escriba al menos 5 caracteres en la dirección. El enlace aparece automáticamente.</p>
-      <p style="margin-bottom:12px"><strong>❌ "La letra es muy pequeña"</strong></p>
-      <p style="color:#666">En PC: Ctrl + (+). En móvil: Separe dos dedos para hacer zoom.</p>
+      <h3 style="color:var(--primary);margin-bottom:16px">🔧 Solución de Problemas</h3>
+      <p style="margin-bottom:10px"><strong>❌ "No se pudo generar el PDF"</strong></p>
+      <p style="margin-bottom:16px;color:var(--text-secondary)">Espere 10-20 segundos tras abrir la página. Recargue si persiste (F5).</p>
+      <p style="margin-bottom:10px"><strong>❌ "Se perdieron mis datos"</strong></p>
+      <p style="margin-bottom:16px;color:var(--text-secondary)">Use el botón <strong>"📤 Exportar Datos"</strong> para respaldar. Los datos se guardan automáticamente en este navegador.</p>
+      <p style="margin-bottom:10px"><strong>❌ "La página se ve rara"</strong></p>
+      <p style="color:var(--text-secondary)">Pruebe cambiar el tema con el botón 🌓 arriba a la derecha.</p>
     </div>
     
     <div id="ayuda-faq" style="display:none">
-      <h3 style="color:#0066cc;font-size:1.3rem;margin-bottom:16px">❓ Preguntas Frecuentes</h3>
-      <p style="margin-bottom:12px"><strong>🤔 ¿Se guarda automáticamente?</strong></p>
-      <p style="margin-bottom:16px;color:#666">No. Debe tocar <strong>"📄 GENERAR PDF"</strong> para guardar.</p>
-      <p style="margin-bottom:12px"><strong>🤔 ¿Puedo usarlo en celular?</strong></p>
-      <p style="margin-bottom:16px;color:#666">Sí. Funciona en Android, iPhone y computadoras.</p>
-      <p style="margin-bottom:12px"><strong>🤔 ¿Qué pasa si escribo "En el hospedaje"?</strong></p>
-      <p style="color:#666">Los campos de dirección se ocultan automáticamente. No necesita llenarlos.</p>
+      <h3 style="color:var(--primary);margin-bottom:16px">❓ Preguntas Frecuentes</h3>
+      <p style="margin-bottom:10px"><strong>🤔 ¿Se guarda automáticamente?</strong></p>
+      <p style="margin-bottom:16px;color:var(--text-secondary)">Sí. Cada 3 segundos se guarda en el navegador. Pero use <strong>Exportar</strong> para respaldo completo.</p>
+      <p style="margin-bottom:10px"><strong>🤔 ¿Funciona sin internet?</strong></p>
+      <p style="margin-bottom:16px;color:var(--text-secondary)">Sí, una vez cargada la página. Pero necesita internet para enviar WhatsApp y ver mapas.</p>
+      <p style="margin-bottom:10px"><strong>🤔 ¿Puedo usarlo en iPhone/Android?</strong></p>
+      <p style="color:var(--text-secondary)">Sí. Está optimizado para móviles. Puede agregarlo a la pantalla de inicio.</p>
     </div>
   </div>
 </div>
 
-<!-- MODAL DE CONTRASEÑA -->
-<div class="password-overlay" id="passwordOverlay" onclick="cerrarLoginAdmin()"></div>
-<div class="password-modal" id="passwordModal">
+<div class="modal-overlay" id="passwordOverlay" onclick="cerrarLoginAdmin()"></div>
+<div class="modal password-modal" id="passwordModal">
   <h3>🔐 Acceso de Administrador</h3>
-  <p style="color:#666;margin-bottom:16px;font-size:.95rem">Ingrese la contraseña para editar los temas de los discursos</p>
+  <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.95rem">Ingrese la contraseña para editar los temas de los discursos</p>
   <input type="password" id="passwordInput" placeholder="••••••••" maxlength="20" onkeypress="if(event.key==='Enter')verificarPassword()">
-  <button class="btn-admin" onclick="verificarPassword()">🔓 Desbloquear</button>
-  <div class="error" id="passwordError">❌ Contraseña incorrecta</div>
+  <button class="btn btn-secondary" style="margin-top:8px" onclick="verificarPassword()">🔓 Desbloquear</button>
+  <div id="passwordError" style="color:var(--danger);margin-top:12px;display:none;font-weight:600">❌ Contraseña incorrecta</div>
   <div class="hint">💡 Pista: admin123</div>
 </div>
 
 <script>
-const dias=['Miércoles','Jueves','Viernes','Sábado','Domingo'];
-const pref=['mie','jue','vie','sab','dom'];
+const dias = ['Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const pref = ['mie','jue','vie','sab','dom'];
 
-// TEMAS POR DEFECTO
 const temasDefault = {
   martes: '¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?',
   miercoles: 'SIGA ADELANTE HACIA LA META (Fil. 3:14)',
@@ -420,18 +1325,282 @@ const temasDefault = {
   segundo: '"JEHOVÁ NO RETENDRÁ NADA BUENO..."'
 };
 
-// FUNCIONES ADMIN
+let vc = 0;
+let autoSaveInterval;
+
+document.addEventListener('DOMContentLoaded', () => {
+  generarSeccionesDinamicas();
+  inicializarEventos();
+  cargarDatosLocalStorage();
+  iniciarAutoSave();
+  verificarTemaGuardado();
+  
+  setTimeout(() => {
+    if (typeof window.jspdf === 'undefined') {
+      showToast('⚠️ Cargando librerías PDF... espere un momento', 'warning');
+    } else {
+      showToast('✅ Herramienta lista. Los datos se guardan automáticamente.', 'success');
+    }
+  }, 1500);
+});
+
+function generarSeccionesDinamicas() {
+  pref.forEach((p, i) => {
+    document.getElementById('pg').innerHTML += `
+      <div class="grid-5">
+        <div class="day">${dias[i]}</div>
+        <div><label>Mañana</label><input type="time" id="pg_m${i}" ${i===0||i===2?'value="09:15"':''}></div>
+        <div><label>Tarde</label><input type="time" id="pg_t${i}" ${i===0||i===2?'value="17:00"':''}></div>
+        <div><label>Lugar</label><input id="pg_l${i}" placeholder="Punto de reunión"></div>
+        <div><label>Territorio</label><input id="pg_ter${i}" placeholder="Terr. asignado"></div>
+      </div>`;
+    
+    document.getElementById('sc').innerHTML += `
+      <div class="grid-5">
+        <div class="day">${dias[i]}</div>
+        <div><label>Mañana</label><input type="time" id="sc_m${i}"></div>
+        <div><label>Hermano</label><input id="sc_n1${i}" placeholder="Nombre"></div>
+        <div><label>Tarde</label><input type="time" id="sc_t${i}"></div>
+        <div><label>Hermano</label><input id="sc_n2${i}" placeholder="Nombre"></div>
+      </div>`;
+    
+    document.getElementById('sp').innerHTML += `
+      <div class="grid-5">
+        <div class="day">${dias[i]}</div>
+        <div><label>Mañana</label><input type="time" id="sp_m${i}"></div>
+        <div><label>Hermana</label><input id="sp_n1${i}" placeholder="Nombre"></div>
+        <div><label>Tarde</label><input type="time" id="sp_t${i}"></div>
+        <div><label>Hermana</label><input id="sp_n2${i}" placeholder="Nombre"></div>
+      </div>`;
+    
+    const cenDef = (i===1||i===3||i===4) ? 'En el hospedaje' : '';
+    document.getElementById('al').innerHTML += `
+      <div style="margin-bottom:20px;padding:18px;background:var(--surface-2);border-radius:14px;border-left:4px solid var(--warning)">
+        <div class="day" style="margin-bottom:14px;font-size:1.05rem">${dias[i]}</div>
+        
+        <div style="background:var(--surface);padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+          <label style="color:var(--warning);font-size:0.95rem">🌅 DESAYUNO</label>
+          <input id="al_d${i}" value="En el hospedaje" style="margin-bottom:6px" oninput="toggleDireccionHospedaje('d',${i})">
+          <div id="div_al_d_dir${i}" class="direccion-hospedaje" style="display:none">
+            <input id="al_d_dir${i}" placeholder="📍 Dirección (si aplica)">
+            <input id="al_d_tel${i}" placeholder="📞 Teléfono (si aplica)" style="margin-top:8px">
+          </div>
+          <div id="link_al_d_dir${i}"></div>
+        </div>
+        
+        <div style="background:var(--surface);padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+          <label style="color:#e65100;font-size:0.95rem">🍖 COMIDA</label>
+          <input id="al_c${i}" placeholder="Lugar de la comida" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('c',${i})">
+          <div id="div_al_c_dir${i}" class="direccion-hospedaje">
+            <input id="al_c_dir${i}" placeholder="📍 Dirección completa">
+            <input id="al_c_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
+          </div>
+          <div id="link_al_c_dir${i}"></div>
+        </div>
+        
+        <div style="background:var(--surface);padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+          <label style="color:#5d4037;font-size:0.95rem">🌙 CENA</label>
+          <input id="al_n${i}" value="${cenDef}" placeholder="Lugar de la cena" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('n',${i})">
+          <div id="div_al_n_dir${i}" class="direccion-hospedaje ${cenDef ? '' : 'visible'}" style="${cenDef ? 'display:none' : ''}">
+            <input id="al_n_dir${i}" placeholder="📍 Dirección completa">
+            <input id="al_n_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
+          </div>
+          <div id="link_al_n_dir${i}"></div>
+        </div>
+      </div>`;
+    
+    setTimeout(() => {
+      toggleDireccionHospedaje('d', i);
+      if (cenDef) toggleDireccionHospedaje('n', i);
+      generarLinkMaps(`al_c_dir${i}`, `link_al_c_dir${i}`);
+      generarLinkMaps(`al_n_dir${i}`, `link_al_n_dir${i}`);
+    }, 100);
+  });
+  
+  addVis(); addVis(); addVis();
+  
+  setTimeout(() => {
+    ['r1d','r2d_dir','r3d','r4d_dir'].forEach(id => {
+      generarLinkMaps(id, 'link_'+id);
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', actualizarProgreso);
+    });
+    actualizarProgreso();
+  }, 200);
+}
+
+function inicializarEventos() {
+  document.querySelectorAll('input[required]').forEach(input => {
+    input.addEventListener('blur', () => validarCampo(input));
+    input.addEventListener('input', () => {
+      if (input.classList.contains('invalid')) validarCampo(input);
+    });
+  });
+  
+  document.querySelectorAll('.timeline-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.timeline-item').forEach(t => t.classList.remove('active'));
+      item.classList.add('active');
+    });
+  });
+}
+
+function validarCampo(input) {
+  if (input.value.trim()) {
+    input.classList.remove('invalid');
+    input.classList.add('valid');
+  } else {
+    input.classList.remove('valid');
+    input.classList.add('invalid');
+  }
+}
+
+function iniciarAutoSave() {
+  autoSaveInterval = setInterval(() => {
+    guardarEnLocalStorage();
+  }, 3000);
+  window.addEventListener('beforeunload', guardarEnLocalStorage);
+}
+
+function guardarEnLocalStorage() {
+  const datos = {};
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.id) datos[el.id] = el.value;
+  });
+  datos['_vc'] = vc;
+  localStorage.setItem('sc_chi03_datos_v2', JSON.stringify(datos));
+}
+
+function cargarDatosLocalStorage() {
+  try {
+    const guardado = localStorage.getItem('sc_chi03_datos_v2');
+    if (!guardado) return;
+    
+    const datos = JSON.parse(guardado);
+    Object.keys(datos).forEach(key => {
+      if (key === '_vc') {
+        for (let i = vc; i < datos[key]; i++) addVis();
+      } else {
+        const el = document.getElementById(key);
+        if (el) {
+          el.value = datos[key];
+          el.dispatchEvent(new Event('input'));
+        }
+      }
+    });
+    showToast('💾 Datos anteriores recuperados automáticamente', 'success');
+  } catch(e) {
+    console.error('Error cargando datos:', e);
+  }
+}
+
+function exportarDatos() {
+  const datos = {};
+  document.querySelectorAll('input, select, textarea').forEach(el => {
+    if (el.id) datos[el.id] = el.value;
+  });
+  datos['_vc'] = vc;
+  
+  const blob = new Blob([JSON.stringify(datos, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `SC_CHI03_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Datos exportados correctamente', 'success');
+}
+
+function importarDatos(input) {
+  const file = input.files[0];
+  if (!file) return;
+  
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const datos = JSON.parse(e.target.result);
+      Object.keys(datos).forEach(key => {
+        if (key === '_vc') {
+          for (let i = vc; i < datos[key]; i++) addVis();
+        } else {
+          const el = document.getElementById(key);
+          if (el) {
+            el.value = datos[key];
+            el.dispatchEvent(new Event('input'));
+          }
+        }
+      });
+      showToast('✅ Datos importados correctamente', 'success');
+    } catch(err) {
+      showToast('❌ Error al importar: archivo inválido', 'error');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function limpiarFormulario() {
+  if (!confirm('¿Está seguro de limpiar TODOS los campos? Esta acción no se puede deshacer.')) return;
+  
+  document.querySelectorAll('input:not([type="checkbox"]), select, textarea').forEach(el => {
+    if (el.id && !el.id.startsWith('tema_')) {
+      el.value = '';
+      el.classList.remove('valid', 'invalid');
+    }
+  });
+  
+  document.getElementById('r1l').value = 'SALÓN DEL REINO';
+  document.getElementById('r2l').value = 'EN DÓNDE DECIDA EL CUERPO DE ANCIANOS';
+  document.getElementById('r3l').value = 'EN DÓNDE DECIDA EL CUERPO DE ANCIANOS';
+  document.getElementById('r4l').value = 'SALÓN DEL REINO';
+  document.getElementById('wa').value = '526121418717';
+  
+  localStorage.removeItem('sc_chi03_datos_v2');
+  showToast('🧹 Formulario limpiado', 'success');
+  actualizarProgreso();
+}
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const actual = html.getAttribute('data-theme');
+  const nuevo = actual === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', nuevo);
+  localStorage.setItem('sc_chi03_tema', nuevo);
+  showToast(nuevo === 'dark' ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado', 'success');
+}
+
+function verificarTemaGuardado() {
+  const tema = localStorage.getItem('sc_chi03_tema');
+  if (tema) document.documentElement.setAttribute('data-theme', tema);
+}
+
+function showToast(mensaje, tipo = 'info') {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = `toast ${tipo}`;
+  toast.innerHTML = `
+    <span>${mensaje}</span>
+    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
+  `;
+  container.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.animation = 'toastOut 0.4s ease forwards';
+    setTimeout(() => toast.remove(), 400);
+  }, 4000);
+}
+
 function mostrarLoginAdmin() {
-  document.getElementById('passwordOverlay').style.display = 'block';
-  document.getElementById('passwordModal').style.display = 'block';
+  document.getElementById('passwordOverlay').classList.add('active');
+  document.getElementById('passwordModal').classList.add('active');
   document.getElementById('passwordInput').value = '';
   document.getElementById('passwordError').style.display = 'none';
   setTimeout(() => document.getElementById('passwordInput').focus(), 100);
 }
 
 function cerrarLoginAdmin() {
-  document.getElementById('passwordOverlay').style.display = 'none';
-  document.getElementById('passwordModal').style.display = 'none';
+  document.getElementById('passwordOverlay').classList.remove('active');
+  document.getElementById('passwordModal').classList.remove('active');
 }
 
 function verificarPassword() {
@@ -439,8 +1608,7 @@ function verificarPassword() {
     cerrarLoginAdmin();
     document.getElementById('adminSection').classList.add('active');
     document.getElementById('adminSection').scrollIntoView({ behavior: 'smooth' });
-    document.querySelector('.admin-btn').innerHTML = '🔓 Admin';
-    setTimeout(() => alert('✅ Modo Administrador activado\n\nAhora puede editar los temas de los discursos.'), 300);
+    showToast('🔓 Modo Administrador activado', 'success');
   } else {
     document.getElementById('passwordError').style.display = 'block';
     document.getElementById('passwordInput').value = '';
@@ -449,213 +1617,178 @@ function verificarPassword() {
 }
 
 function guardarTemas() {
-  document.getElementById('guardadoMsg').style.display = 'block';
-  setTimeout(() => document.getElementById('guardadoMsg').style.display = 'none', 3000);
+  showToast('✅ Temas guardados. Se aplicarán al generar el PDF.', 'success');
 }
 
 function restaurarTemas() {
-  if (confirm('¿Restaurar temas originales del CHI-03?')) {
-    document.getElementById('tema_martes').value = temasDefault.martes;
-    document.getElementById('tema_miercoles').value = temasDefault.miercoles;
-    document.getElementById('tema_viernes').value = temasDefault.viernes;
-    document.getElementById('tema_sabado').value = temasDefault.sabado;
-    document.getElementById('tema_2do').value = temasDefault.segundo;
-    document.getElementById('guardadoMsg').textContent = '✅ Temas restaurados a valores originales';
-    document.getElementById('guardadoMsg').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('guardadoMsg').style.display = 'none';
-      document.getElementById('guardadoMsg').textContent = '✅ ¡Temas guardados correctamente!';
-    }, 3000);
-  }
+  if (!confirm('¿Restaurar temas originales del CHI-03?')) return;
+  document.getElementById('tema_martes').value = temasDefault.martes;
+  document.getElementById('tema_miercoles').value = temasDefault.miercoles;
+  document.getElementById('tema_viernes').value = temasDefault.viernes;
+  document.getElementById('tema_sabado').value = temasDefault.sabado;
+  document.getElementById('tema_2do').value = temasDefault.segundo;
+  showToast('↩️ Temas restaurados a valores originales', 'success');
 }
 
-// AYUDA
 function abrirAyuda() {
-  document.getElementById('helpOverlay').style.display = 'block';
-  document.getElementById('helpModal').style.display = 'block';
+  document.getElementById('helpOverlay').classList.add('active');
+  document.getElementById('helpModal').classList.add('active');
   document.body.style.overflow = 'hidden';
-  document.querySelector('.help-button').classList.remove('pulse');
 }
 
 function cerrarAyuda() {
-  document.getElementById('helpOverlay').style.display = 'none';
-  document.getElementById('helpModal').style.display = 'none';
+  document.getElementById('helpOverlay').classList.remove('active');
+  document.getElementById('helpModal').classList.remove('active');
   document.body.style.overflow = 'auto';
 }
 
 function mostrarSeccionAyuda(id, btn) {
-  ['inicio','primeravez','pasoapaso','problemas','faq'].forEach(s => document.getElementById('ayuda-'+s).style.display = 'none');
+  ['inicio','primeravez','pasoapaso','problemas','faq'].forEach(s => {
+    document.getElementById('ayuda-'+s).style.display = 'none';
+  });
   document.getElementById('ayuda-'+id).style.display = 'block';
-  btn.parentNode.querySelectorAll('button').forEach(b => b.style.cssText = 'flex:1;min-width:140px;padding:14px;background:#f5f5f5;border:2px solid #e0e0e0;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600');
-  btn.style.cssText = 'flex:1;min-width:140px;padding:14px;background:#0066cc;color:#fff;border:2px solid #0066cc;border-radius:10px;cursor:pointer;font-size:.95rem;font-weight:600';
+  
+  const buttons = btn.parentNode.querySelectorAll('button');
+  buttons.forEach(b => {
+    b.classList.remove('btn');
+    b.classList.add('btn-outline');
+  });
+  btn.classList.remove('btn-outline');
+  btn.classList.add('btn');
 }
 
-// MAPS
 function generarLinkMaps(inputId, containerId) {
   const input = document.getElementById(inputId);
   const container = document.getElementById(containerId);
+  if (!input || !container) return;
+  
   input.addEventListener('input', function() {
     const direccion = this.value.trim();
     if (direccion.length > 5) {
       const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
-      container.innerHTML = `<a href="${url}" target="_blank" class="maps-link">🗺️ Ver "${direccion.substring(0,40)}${direccion.length>40?'...':''}" en Google Maps →</a>`;
+      container.innerHTML = `<a href="${url}" target="_blank" class="maps-link">🗺️ Ver en Google Maps →</a>`;
     } else {
       container.innerHTML = '';
     }
   });
 }
 
+function actualizarPreviewMaps(inputId, containerId) {
+  const input = document.getElementById(inputId);
+  const container = document.getElementById(containerId);
+  if (!input || !container) return;
+  
+  const direccion = input.value.trim();
+  if (direccion.length > 5) {
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
+    container.innerHTML = `<a href="${url}" target="_blank" class="maps-link">🗺️ Ver "${direccion.substring(0,35)}${direccion.length>35?'...':''}" en Maps →</a>`;
+  } else {
+    container.innerHTML = '';
+  }
+}
+
 function abrirMaps(inputId) {
-  const direccion = document.getElementById(inputId).value;
-  if (!direccion) { alert('⚠️ Primero escriba una dirección'); return; }
+  const direccion = document.getElementById(inputId)?.value;
+  if (!direccion) { showToast('⚠️ Primero escriba una dirección', 'warning'); return; }
   window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`, '_blank');
 }
 
-// ALIMENTOS CON LÓGICA DE HOSPEDAJE
 function toggleDireccionHospedaje(tipo, index) {
   const lugarInput = document.getElementById(`al_${tipo}${index}`);
   const direccionDiv = document.getElementById(`div_al_${tipo}_dir${index}`);
   const telefonoInput = document.getElementById(`al_${tipo}_tel${index}`);
   const linkDiv = document.getElementById(`link_al_${tipo}_dir${index}`);
   
+  if (!lugarInput || !direccionDiv) return;
+  
   const esHospedaje = lugarInput.value.trim().toLowerCase().includes('hospedaje');
   
   if (esHospedaje) {
     direccionDiv.classList.remove('visible');
     direccionDiv.style.display = 'none';
-    telefonoInput.style.display = 'none';
-    linkDiv.innerHTML = '<span class="hospedaje-badge">🏠 En el hospedaje - Sin dirección adicional</span>';
-    document.getElementById(`al_${tipo}_dir${index}`).value = 'En el hospedaje';
+    if (telefonoInput) telefonoInput.style.display = 'none';
+    if (linkDiv) linkDiv.innerHTML = '<span class="hospedaje-badge">🏠 En el hospedaje</span>';
+    const dirInput = document.getElementById(`al_${tipo}_dir${index}`);
+    if (dirInput) dirInput.value = 'En el hospedaje';
   } else {
     direccionDiv.style.display = 'block';
     direccionDiv.classList.add('visible');
-    telefonoInput.style.display = 'block';
-    linkDiv.innerHTML = '';
-    if (document.getElementById(`al_${tipo}_dir${index}`).value === 'En el hospedaje') {
-      document.getElementById(`al_${tipo}_dir${index}`).value = '';
-    }
+    if (telefonoInput) telefonoInput.style.display = 'block';
+    if (linkDiv) linkDiv.innerHTML = '';
+    const dirInput = document.getElementById(`al_${tipo}_dir${index}`);
+    if (dirInput && dirInput.value === 'En el hospedaje') dirInput.value = '';
   }
 }
 
-// GENERAR SECCIONES
-pref.forEach((p,i)=>{
-  // Predicación
-  document.getElementById('pg').innerHTML+=`<div class="grid-5"><div class="day">${dias[i]}</div>
-  <div><label>MAÑANA</label><input type="time" id="pg_m${i}" ${i===0||i===2?'value="09:15"':''}></div>
-  <div><label>TARDE</label><input type="time" id="pg_t${i}" ${i===0||i===2?'value="17:00"':''}></div>
-  <div><label>LUGAR</label><input id="pg_l${i}"></div>
-  <div><label>TERR.</label><input id="pg_ter${i}"></div></div>`;
-  
-  // Con SC
-  document.getElementById('sc').innerHTML+=`<div class="grid-5"><div class="day">${dias[i]}</div>
-  <div><label>MAÑANA</label><input type="time" id="sc_m${i}"></div>
-  <div><label>HERMANO</label><input id="sc_n1${i}"></div>
-  <div><label>TARDE</label><input type="time" id="sc_t${i}"></div>
-  <div><label>HERMANO</label><input id="sc_n2${i}"></div></div>`;
-  
-  // Con Esposa
-  document.getElementById('sp').innerHTML+=`<div class="grid-5"><div class="day">${dias[i]}</div>
-  <div><label>MAÑANA</label><input type="time" id="sp_m${i}"></div>
-  <div><label>HERMANA</label><input id="sp_n1${i}"></div>
-  <div><label>TARDE</label><input type="time" id="sp_t${i}"></div>
-  <div><label>HERMANA</label><input id="sp_n2${i}"></div></div>`;
-  
-  // Alimentos con lógica de hospedaje
-  const cenDef = i===1||i===3||i===4 ? 'En el hospedaje' : '';
-  document.getElementById('al').innerHTML+=`
-  <div style="margin-bottom:20px;padding:16px;background:#f8f9fa;border-radius:12px;border-left:4px solid #ff9800">
-    <div class="day" style="margin-bottom:12px">${dias[i]}</div>
-    
-    <!-- DESAYUNO -->
-    <div style="background:#fff;padding:14px;border-radius:10px;margin-bottom:12px">
-      <label style="color:#ff9800;font-size:1.05rem">🌅 DESAYUNO</label>
-      <input id="al_d${i}" value="En el hospedaje" style="margin-bottom:6px" oninput="toggleDireccionHospedaje('d',${i})">
-      <div id="div_al_d_dir${i}" class="direccion-hospedaje" style="display:none">
-        <input id="al_d_dir${i}" placeholder="📍 Dirección (si aplica)">
-        <input id="al_d_tel${i}" placeholder="📞 Teléfono (si aplica)">
-      </div>
-      <div id="link_al_d_dir${i}"></div>
-    </div>
-    
-    <!-- COMIDA -->
-    <div style="background:#fff;padding:14px;border-radius:10px;margin-bottom:12px">
-      <label style="color:#e65100;font-size:1.05rem">🍖 COMIDA</label>
-      <input id="al_c${i}" placeholder="Lugar de la comida" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('c',${i})">
-      <div id="div_al_c_dir${i}" class="direccion-hospedaje">
-        <input id="al_c_dir${i}" placeholder="📍 Dirección completa">
-        <input id="al_c_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
-      </div>
-      <div id="link_al_c_dir${i}"></div>
-    </div>
-    
-    <!-- CENA -->
-    <div style="background:#fff;padding:14px;border-radius:10px">
-      <label style="color:#5d4037;font-size:1.05rem">🌙 CENA</label>
-      <input id="al_n${i}" value="${cenDef}" placeholder="Lugar de la cena" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('n',${i})">
-      <div id="div_al_n_dir${i}" class="direccion-hospedaje ${cenDef ? '' : 'visible'}" style="${cenDef ? 'display:none' : ''}">
-        <input id="al_n_dir${i}" placeholder="📍 Dirección completa">
-        <input id="al_n_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
-      </div>
-      <div id="link_al_n_dir${i}"></div>
-    </div>
-  </div>`;
-  
-  // Inicializar lógica de hospedaje
-  setTimeout(() => {
-    // Desayuno siempre es hospedaje por defecto
-    toggleDireccionHospedaje('d', i);
-    // Cena según día
-    if (cenDef) toggleDireccionHospedaje('n', i);
-    
-    // Listeners para Maps
-    generarLinkMaps(`al_c_dir${i}`, `link_al_c_dir${i}`);
-    generarLinkMaps(`al_n_dir${i}`, `link_al_n_dir${i}`);
-  }, 100);
-});
+function toggleChecklist(item) {
+  const checkbox = item.querySelector('input[type="checkbox"]');
+  checkbox.checked = !checkbox.checked;
+  item.classList.toggle('checked', checkbox.checked);
+}
 
-// Visitas
-let vc=0;
-function addVis(){
+function addVis() {
   const index = vc;
-  document.getElementById('vis').innerHTML+=`<div id="vr${index}" style="margin-bottom:14px;padding:16px;background:#f8f9fa;border-radius:12px;position:relative;border-left:4px solid #0066cc">
-  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px">
-    <div><label>DÍA</label><select id="vd${index}"><option>Mié</option><option>Jue</option><option>Vie</option><option>Sáb</option><option>Dom</option></select></div>
-    <div><label>HORA</label><input type="time" id="vh${index}"></div>
-  </div>
-  <div style="margin-bottom:12px"><label>FAMILIA</label><input id="vf${index}" placeholder="Apellido de la familia"></div>
-  <div style="margin-bottom:12px"><label>ANCIANO/SM</label><input id="va${index}" placeholder="Nombre del anciano o SM"></div>
-  <div style="background:#e3f2fd;padding:16px;border-radius:10px;margin-bottom:12px">
-    <label style="color:#1565c0;font-size:1.05rem">📍 DIRECCIÓN COMPLETA</label>
-    <input id="vdir${index}" placeholder="Calle, número, colonia, ciudad" style="margin-bottom:10px">
-    <input id="vtel${index}" placeholder="📞 Teléfono de la familia o anciano" style="margin-bottom:10px">
-    <div id="link_vdir${index}"></div>
-    <div class="contacto-box" style="margin-top:12px">💡 <strong>Referencia:</strong> "casa blanca con portón negro, frente a farmacia"</div>
-  </div>
-  ${index>0?`<button type="button" class="remove" onclick="this.parentElement.remove()" style="position:absolute;top:14px;right:14px">✕ Eliminar</button>`:''}
-  </div>`;
+  const container = document.getElementById('vis');
+  const div = document.createElement('div');
+  div.id = `vr${index}`;
+  div.style.cssText = 'margin-bottom:14px;padding:18px;background:var(--surface-2);border-radius:14px;position:relative;border-left:4px solid var(--primary);animation:fadeInUp 0.4s ease';
+  div.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px">
+      <div><label>Día</label><select id="vd${index}"><option>Mié</option><option>Jue</option><option>Vie</option><option>Sáb</option><option>Dom</option></select></div>
+      <div><label>Hora</label><input type="time" id="vh${index}"></div>
+    </div>
+    <div style="margin-bottom:12px"><label>Familia</label><input id="vf${index}" placeholder="Apellido de la familia"></div>
+    <div style="margin-bottom:12px"><label>Anciano / SM</label><input id="va${index}" placeholder="Nombre"></div>
+    <div style="background:var(--primary-light);padding:16px;border-radius:12px;margin-bottom:12px">
+      <label style="color:var(--primary);font-size:0.95rem">📍 Dirección Completa</label>
+      <input id="vdir${index}" placeholder="Calle, número, colonia, ciudad" style="margin-bottom:10px" oninput="actualizarPreviewMaps('vdir${index}','link_vdir${index}')">
+      <input id="vtel${index}" placeholder="📞 Teléfono" style="margin-bottom:10px">
+      <div id="link_vdir${index}"></div>
+      <div class="contacto-box" style="margin-top:12px;font-size:0.85rem">💡 Referencia: "casa blanca con portón negro, frente a farmacia"</div>
+    </div>
+    ${index > 0 ? `<button type="button" class="btn-remove" onclick="eliminarVisita(${index})">✕ Eliminar</button>` : ''}
+  `;
+  container.appendChild(div);
   
   setTimeout(() => generarLinkMaps(`vdir${index}`, `link_vdir${index}`), 100);
   vc++;
-}
-addVis();addVis();addVis();
-
-// Listeners reuniones
-setTimeout(() => {
-  ['r1d','r2d_dir','r3d','r4d_dir'].forEach(id => {
-    generarLinkMaps(id, 'link_'+id);
-    document.getElementById(id)?.addEventListener('input', actualizarProgreso);
-  });
   actualizarProgreso();
-}, 100);
+}
+
+function eliminarVisita(index) {
+  const el = document.getElementById(`vr${index}`);
+  if (el) {
+    el.style.animation = 'fadeInUp 0.3s ease reverse forwards';
+    setTimeout(() => el.remove(), 300);
+  }
+}
 
 function actualizarProgreso() {
   const campos = document.querySelectorAll('input[required], input[id$="d"]:not([id^="al_d"])');
   let completados = 0;
-  campos.forEach(c => { if (c.value.trim()) completados++; });
-  document.getElementById('progressBar').style.width = Math.min((completados/campos.length)*100,100)+'%';
+  let total = 0;
+  
+  campos.forEach(c => {
+    if (c.offsetParent !== null) {
+      total++;
+      if (c.value.trim()) completados++;
+    }
+  });
+  
+  const porcentaje = total > 0 ? Math.min((completados / total) * 100, 100) : 0;
+  document.getElementById('progressBar').style.width = porcentaje + '%';
+  document.getElementById('progressText').textContent = Math.round(porcentaje) + '% Completado';
+  document.getElementById('fieldsCount').textContent = `${completados}/${total} campos`;
+  
+  const items = document.querySelectorAll('.timeline-item');
+  items.forEach((item, i) => {
+    item.classList.remove('completed', 'active');
+    if (porcentaje >= (i / items.length) * 100) item.classList.add('completed');
+  });
 }
 
-// WHATSAPP
+document.addEventListener('input', actualizarProgreso);
+
 function enviarResumenUbicaciones() {
   const waNum = document.getElementById('wa').value.replace(/\D/g,'') || '526121418717';
   const cong = document.getElementById('cong').value || '______________';
@@ -663,56 +1796,57 @@ function enviarResumenUbicaciones() {
   
   let mensaje = `📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n`;
   
-  // Hospedaje
   const scDir = document.getElementById('sc_direccion').value;
   if (scDir) {
     mensaje += `🏠 *HOSPEDAJE SC:*\n📍 ${scDir}\n📞 ${document.getElementById('sc_telefono').value||'-'}\n🗺️ ${generarUrlMaps(scDir)}\n\n`;
   }
   
-  // Reuniones
   mensaje += `*📅 REUNIONES:*\n\n`;
   const reuniones = [
-    {n:'Martes - 1er Discurso',d:'r1d',t:'r1t',h:'r1h'},
-    {n:document.getElementById('r2d').value+' - Precursores',d:'r2d_dir',t:'r2t',h:'r2h'},
-    {n:'Viernes - Ancianos/SM',d:'r3d',t:'r3t',h:'r3h'},
-    {n:document.getElementById('r4d').value+' - Discurso Público',d:'r4d_dir',t:'r4t',h:'r4h'}
+    {n:'Martes - 1er Discurso', d:'r1d', t:'r1t', h:'r1h'},
+    {n:(document.getElementById('r2d')?.value||'Miércoles')+' - Precursores', d:'r2d_dir', t:'r2t', h:'r2h'},
+    {n:'Viernes - Ancianos/SM', d:'r3d', t:'r3t', h:'r3h'},
+    {n:(document.getElementById('r4d')?.value||'Sábado')+' - Discurso Público', d:'r4d_dir', t:'r4t', h:'r4h'}
   ];
+  
   reuniones.forEach(r => {
-    const dir = document.getElementById(r.d).value;
+    const dirEl = document.getElementById(r.d);
+    const dir = dirEl ? dirEl.value : '';
     if (dir) {
       mensaje += `• *${r.n}*\n`;
-      if (document.getElementById(r.h).value) mensaje += `🕐 ${document.getElementById(r.h).value}\n`;
+      const hEl = document.getElementById(r.h);
+      if (hEl && hEl.value) mensaje += `🕐 ${hEl.value}\n`;
       mensaje += `📍 ${dir}\n`;
-      if (document.getElementById(r.t).value) mensaje += `📞 ${document.getElementById(r.t).value}\n`;
+      const tEl = document.getElementById(r.t);
+      if (tEl && tEl.value) mensaje += `📞 ${tEl.value}\n`;
       mensaje += `🗺️ ${generarUrlMaps(dir)}\n\n`;
     }
   });
   
-  // Alimentos
   let msgAlim = `*🍽️ ALIMENTOS:*\n\n`;
   let tieneAlim = false;
-  pref.forEach((p,i) => {
-    const c = document.getElementById(`al_c${i}`).value;
-    const cDir = document.getElementById(`al_c_dir${i}`).value;
-    const n = document.getElementById(`al_n${i}`).value;
-    const nDir = document.getElementById(`al_n_dir${i}`).value;
+  pref.forEach((_,i) => {
+    const c = document.getElementById(`al_c${i}`)?.value;
+    const cDir = document.getElementById(`al_c_dir${i}`)?.value;
+    const n = document.getElementById(`al_n${i}`)?.value;
+    const nDir = document.getElementById(`al_n_dir${i}`)?.value;
     
     if (c || n) {
       tieneAlim = true;
       msgAlim += `*${dias[i]}:*\n`;
       if (c) {
         msgAlim += `🍖 ${c}\n`;
-        if (cDir && !cDir.includes('hospedaje')) {
+        if (cDir && !cDir.toLowerCase().includes('hospedaje')) {
           msgAlim += `📍 ${cDir}\n🗺️ ${generarUrlMaps(cDir)}\n`;
-        } else if (cDir.includes('hospedaje')) {
+        } else if (cDir && cDir.toLowerCase().includes('hospedaje')) {
           msgAlim += `🏠 En el hospedaje\n`;
         }
       }
       if (n) {
         msgAlim += `🌙 ${n}\n`;
-        if (nDir && !nDir.includes('hospedaje')) {
+        if (nDir && !nDir.toLowerCase().includes('hospedaje')) {
           msgAlim += `📍 ${nDir}\n🗺️ ${generarUrlMaps(nDir)}\n`;
-        } else if (nDir.includes('hospedaje')) {
+        } else if (nDir && nDir.toLowerCase().includes('hospedaje')) {
           msgAlim += `🏠 En el hospedaje\n`;
         }
       }
@@ -721,16 +1855,15 @@ function enviarResumenUbicaciones() {
   });
   if (tieneAlim) mensaje += msgAlim;
   
-  // Visitas
   let msgVis = `*🏠 VISITAS:*\n\n`;
   let tieneVis = false;
   for (let i=0; i<vc; i++) {
     const r = document.getElementById(`vr${i}`);
     if (r) {
-      const dia = document.getElementById(`vd${i}`).value;
-      const hora = document.getElementById(`vh${i}`).value;
-      const fam = document.getElementById(`vf${i}`).value;
-      const dir = document.getElementById(`vdir${i}`)?.value;
+      const dia = document.getElementById(`vd${i}`)?.value||'';
+      const hora = document.getElementById(`vh${i}`)?.value||'';
+      const fam = document.getElementById(`vf${i}`)?.value||'';
+      const dir = document.getElementById(`vdir${i}`)?.value||'';
       if (dir) {
         tieneVis = true;
         msgVis += `• *${dia}${hora?' - '+hora:''}*\n`;
@@ -749,112 +1882,244 @@ function generarUrlMaps(direccion) {
   return `https://maps.google.com/?q=${encodeURIComponent(direccion)}`;
 }
 
-// PDF
-async function gen(){
-  const f=document.getElementById('f');
-  if(!f.checkValidity()){f.reportValidity();return;}
-  if(typeof window.jspdf==='undefined'){alert('⚠️ Espere unos segundos e intente de nuevo.');return;}
+async function generarPDFData() {
+  if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
+    throw new Error('Las librerías PDF aún están cargando. Espere unos segundos e intente de nuevo.');
+  }
   
-  const{jsPDF}=window.jspdf;const doc=new jsPDF();
-  const W=doc.internal.pageSize.getWidth();const M=14;
+  const {jsPDF} = window.jspdf;
+  const doc = new jsPDF();
+  const W = doc.internal.pageSize.getWidth();
+  const M = 14;
   
-  // Header
-  doc.setFillColor(0,102,204);doc.rect(0,0,W,38,'F');
-  doc.setTextColor(255);doc.setFontSize(14);doc.setFont('helvetica','bold');
-  doc.text('PROGRAMA DE ACTIVIDADES DURANTE LA VISITA DEL SC',W/2,14,{align:'center'});
-  doc.setFontSize(11);doc.text('A LA CONGREGACIÓN',W/2,22,{align:'center'});
-  doc.setFontSize(10);doc.text('FECHA: MARZO A AGOSTO DE 2026',W/2,30,{align:'center'});
-  const con=document.getElementById('cong').value.toUpperCase()||'______________';
-  const fec=document.getElementById('fec').value||'______________';
-  doc.setFontSize(9);doc.text(`CONGREGACIÓN: ${con}   FECHA: ${fec}`,M,36);
+  const headerColor = [0, 102, 204];
   
-  // TEMAS PERSONALIZADOS
+  doc.setFillColor(...headerColor);
+  doc.rect(0, 0, W, 40, 'F');
+  doc.setTextColor(255);
+  doc.setFontSize(15);
+  doc.setFont(undefined, 'bold');
+  doc.text('PROGRAMA DE ACTIVIDADES DURANTE LA VISITA DEL SC', W/2, 16, {align:'center'});
+  doc.setFontSize(12);
+  doc.text('A LA CONGREGACIÓN', W/2, 25, {align:'center'});
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  doc.text('FECHA: MARZO A AGOSTO DE 2026', W/2, 33, {align:'center'});
+  
+  const cong = document.getElementById('cong').value.toUpperCase() || '______________';
+  const fec = document.getElementById('fec').value || '______________';
+  doc.setFontSize(9);
+  doc.text(`CONGREGACIÓN: ${cong}   FECHA: ${fec}`, M, 38);
+  
   const temaMartes = document.getElementById('tema_martes')?.value || temasDefault.martes;
   const temaMierc = document.getElementById('tema_miercoles')?.value || temasDefault.miercoles;
   const temaViern = document.getElementById('tema_viernes')?.value || temasDefault.viernes;
   const temaSab = document.getElementById('tema_sabado')?.value || temasDefault.sabado;
   const tema2do = document.getElementById('tema_2do')?.value || temasDefault.segundo;
   
-  let y=45;
-  const chk=(n=15)=>{if(y+n>doc.internal.pageSize.getHeight()-18){doc.addPage();y=18;}};
-  const TS={theme:'grid',styles:{cellPadding:3,fontSize:8.5,overflow:'linebreak'},margin:{left:M,right:M},
-    headStyles:{fillColor:[230,240,250],textColor:[0,51,102],fontStyle:'bold'},alternateRowStyles:{fillColor:[248,249,250]}};
+  let y = 46;
+  const chk = (n=15) => {
+    if (y + n > doc.internal.pageSize.getHeight() - 20) {
+      doc.addPage();
+      y = 18;
+    }
+  };
   
-  // Reuniones
-  chk(35);doc.autoTable({...TS,startY:y,head:[['DÍA','HORA','REUNIÓN','LUGAR','DIRECCIÓN','TELÉFONO']],body:[
-    ['Martes',document.getElementById('r1h').value||'--',`1er disc.: ${temaMartes}\n(CANCIÓN 76)`,document.getElementById('r1l').value,document.getElementById('r1d').value||'-',document.getElementById('r1t').value||'-'],
-    [document.getElementById('r2d').value,document.getElementById('r2h').value||'--',`Precursores: ${temaMierc}`,document.getElementById('r2l').value,document.getElementById('r2d_dir').value||'-',document.getElementById('r2t').value||'-'],
-    ['Viernes',document.getElementById('r3h').value||'--',`Ancianos/SM: ${temaViern}`,document.getElementById('r3l').value,document.getElementById('r3d').value||'-',document.getElementById('r3t').value||'-'],
-    [document.getElementById('r4d').value,document.getElementById('r4h').value||'--',`Disc. Público: ${temaSab}\n(Can. 145)\n2do servicio: ${tema2do}\n(Can. 155)`,document.getElementById('r4l').value,document.getElementById('r4d_dir').value||'-',document.getElementById('r4t').value||'-']
-  ]});y=doc.lastAutoTable.finalY+6;
+  const TS = {
+    theme: 'grid',
+    styles: {cellPadding: 2.5, fontSize: 7.8, overflow: 'linebreak', lineWidth: 0.1, font: 'helvetica'},
+    margin: {left: M, right: M},
+    headStyles: {fillColor: [230,240,250], textColor: [0,51,102], fontStyle: 'bold'},
+    alternateRowStyles: {fillColor: [248,249,250]},
+    tableWidth: 'auto'
+  };
   
-  // Predicación
-  chk(24);doc.autoTable({...TS,startY:y,head:[['DÍA','MAÑANA','TARDE','LUGAR','TERR.']],
-    body:pref.map((_,i)=>[dias[i],document.getElementById(`pg_m${i}`).value||'-',document.getElementById(`pg_t${i}`).value||'-',document.getElementById(`pg_l${i}`).value||'-',document.getElementById(`pg_ter${i}`).value||'-'])});y=doc.lastAutoTable.finalY+6;
+  chk(45);
+  doc.autoTable({
+    ...TS,
+    startY: y,
+    head: [['DÍA','HORA','REUNIÓN','LUGAR','DIRECCIÓN','TELÉFONO']],
+    body: [
+      ['Martes', document.getElementById('r1h').value||'--', `1er disc.:\n${temaMartes}\n(Canción 76)`, document.getElementById('r1l').value||'-', document.getElementById('r1d').value||'-', document.getElementById('r1t').value||'-'],
+      [document.getElementById('r2d').value, document.getElementById('r2h').value||'--', `Precursores:\n${temaMierc}`, document.getElementById('r2l').value||'-', document.getElementById('r2d_dir').value||'-', document.getElementById('r2t').value||'-'],
+      ['Viernes', document.getElementById('r3h').value||'--', `Ancianos/SM:\n${temaViern}`, document.getElementById('r3l').value||'-', document.getElementById('r3d').value||'-', document.getElementById('r3t').value||'-'],
+      [document.getElementById('r4d').value, document.getElementById('r4h').value||'--', `Disc. Público:\n${temaSab}\n(Canc. 145)\n2do servicio:\n${tema2do}\n(Canc. 155)`, document.getElementById('r4l').value||'-', document.getElementById('r4d_dir').value||'-', document.getElementById('r4t').value||'-']
+    ],
+    columnStyles: {2: {cellWidth: 52}}
+  });
+  y = doc.lastAutoTable.finalY + 5;
   
-  // Con SC
-  chk(24);doc.autoTable({...TS,startY:y,head:[['DÍA','MAÑANA','HERMANO','TARDE','HERMANO']],
-    body:pref.map((_,i)=>[dias[i],document.getElementById(`sc_m${i}`).value||'-',document.getElementById(`sc_n1${i}`).value||'-',document.getElementById(`sc_t${i}`).value||'-',document.getElementById(`sc_n2${i}`).value||'-'])});y=doc.lastAutoTable.finalY+6;
+  chk(25);
+  doc.autoTable({
+    ...TS, startY: y,
+    head: [['DÍA','MAÑANA','TARDE','LUGAR','TERR.']],
+    body: pref.map((_,i) => [dias[i], document.getElementById(`pg_m${i}`).value||'-', document.getElementById(`pg_t${i}`).value||'-', document.getElementById(`pg_l${i}`).value||'-', document.getElementById(`pg_ter${i}`).value||'-'])
+  });
+  y = doc.lastAutoTable.finalY + 5;
   
-  // Con Esposa
-  chk(24);doc.autoTable({...TS,startY:y,head:[['DÍA','MAÑANA','HERMANA','TARDE','HERMANA']],
-    body:pref.map((_,i)=>[dias[i],document.getElementById(`sp_m${i}`).value||'-',document.getElementById(`sp_n1${i}`).value||'-',document.getElementById(`sp_t${i}`).value||'-',document.getElementById(`sp_n2${i}`).value||'-'])});y=doc.lastAutoTable.finalY+6;
+  chk(25);
+  doc.autoTable({
+    ...TS, startY: y,
+    head: [['DÍA','MAÑANA','HERMANO','TARDE','HERMANO']],
+    body: pref.map((_,i) => [dias[i], document.getElementById(`sc_m${i}`).value||'-', document.getElementById(`sc_n1${i}`).value||'-', document.getElementById(`sc_t${i}`).value||'-', document.getElementById(`sc_n2${i}`).value||'-'])
+  });
+  y = doc.lastAutoTable.finalY + 5;
   
-  // Alimentos
-  chk(32);doc.autoTable({...TS,startY:y,head:[['DÍA','DESAYUNO','COMIDA','DIR. COMIDA','TEL. COMIDA','CENA','DIR. CENA','TEL. CENA']],
-    body:pref.map((_,i)=>{
-      const dVal = document.getElementById(`al_d${i}`).value;
-      const cVal = document.getElementById(`al_c${i}`).value;
-      const nVal = document.getElementById(`al_n${i}`).value;
+  chk(25);
+  doc.autoTable({
+    ...TS, startY: y,
+    head: [['DÍA','MAÑANA','HERMANA','TARDE','HERMANA']],
+    body: pref.map((_,i) => [dias[i], document.getElementById(`sp_m${i}`).value||'-', document.getElementById(`sp_n1${i}`).value||'-', document.getElementById(`sp_t${i}`).value||'-', document.getElementById(`sp_n2${i}`).value||'-'])
+  });
+  y = doc.lastAutoTable.finalY + 5;
+  
+  chk(35);
+  doc.autoTable({
+    ...TS, startY: y,
+    head: [['DÍA','DESAYUNO','COMIDA','DIR. COMIDA','TEL. COMIDA','CENA','DIR. CENA','TEL. CENA']],
+    body: pref.map((_,i) => {
+      const dVal = document.getElementById(`al_d${i}`)?.value;
+      const cVal = document.getElementById(`al_c${i}`)?.value;
+      const nVal = document.getElementById(`al_n${i}`)?.value;
+      const cDir = document.getElementById(`al_c_dir${i}`)?.value || '';
+      const nDir = document.getElementById(`al_n_dir${i}`)?.value || '';
       return [
-        dias[i],
-        dVal||'-',
-        cVal||'-',
-        (cVal && cVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (document.getElementById(`al_c_dir${i}`)?.value||'-'),
+        dias[i], dVal||'-', cVal||'-',
+        (cVal && cVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (cDir||'-'),
         (cVal && cVal.toLowerCase().includes('hospedaje')) ? '-' : (document.getElementById(`al_c_tel${i}`)?.value||'-'),
         nVal||'-',
-        (nVal && nVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (document.getElementById(`al_n_dir${i}`)?.value||'-'),
+        (nVal && nVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (nDir||'-'),
         (nVal && nVal.toLowerCase().includes('hospedaje')) ? '-' : (document.getElementById(`al_n_tel${i}`)?.value||'-')
       ];
-    })});y=doc.lastAutoTable.finalY+6;
+    }),
+    styles: {fontSize: 7, cellPadding: 2},
+    columnStyles: {
+      0: {cellWidth: 20}, 1: {cellWidth: 26}, 2: {cellWidth: 26},
+      3: {cellWidth: 30}, 4: {cellWidth: 22},
+      5: {cellWidth: 26}, 6: {cellWidth: 30}, 7: {cellWidth: 22}
+    }
+  });
+  y = doc.lastAutoTable.finalY + 5;
   
-  // Visitas
-  chk(24);let vr=[];for(let i=0;i<vc;i++){const r=document.getElementById(`vr${i}`);if(r)vr.push([
-    document.getElementById(`vd${i}`).value,
-    document.getElementById(`vh${i}`).value||'-',
-    document.getElementById(`vf${i}`).value||'-',
-    document.getElementById(`va${i}`).value||'-',
-    document.getElementById(`vdir${i}`)?.value||'-',
-    document.getElementById(`vtel${i}`)?.value||'-'
-  ]);}
-  if(vr.length===0)vr.push(['-','-','-','-','-','-']);
-  doc.autoTable({...TS,startY:y,head:[['DÍA','HORA','FAMILIA','ANCIANO/SM','DIRECCIÓN','TELÉFONO']],body:vr});y=doc.lastAutoTable.finalY+6;
+  chk(25);
+  let vr = [];
+  for(let i=0; i<vc; i++){
+    const r = document.getElementById(`vr${i}`);
+    if(r){
+      vr.push([
+        document.getElementById(`vd${i}`)?.value||'-',
+        document.getElementById(`vh${i}`)?.value||'-',
+        document.getElementById(`vf${i}`)?.value||'-',
+        document.getElementById(`va${i}`)?.value||'-',
+        document.getElementById(`vdir${i}`)?.value||'-',
+        document.getElementById(`vtel${i}`)?.value||'-'
+      ]);
+    }
+  }
+  if(vr.length === 0) vr.push(['-','-','-','-','-','-']);
   
-  // Agenda
-  chk(20);doc.autoTable({...TS,startY:y,head:[['#','ASUNTO']],body:[['1.',document.getElementById('ag1').value||'-'],['2.',document.getElementById('ag2').value||'-'],['3.',document.getElementById('ag3').value||'-']]});y=doc.lastAutoTable.finalY+7;
+  doc.autoTable({...TS, startY: y, head: [['DÍA','HORA','FAMILIA','ANCIANO/SM','DIRECCIÓN','TELÉFONO']], body: vr});
+  y = doc.lastAutoTable.finalY + 5;
   
-  // Footer info
-  chk(16);doc.setFillColor(232,245,233);doc.rect(M,y,W-M*2,14,'F');
-  doc.setTextColor(46,125,50);doc.setFontSize(8);
-  doc.text(`HOSPEDAJE SC: ${document.getElementById('sc_direccion').value||'No registrado'} | TEL: ${document.getElementById('sc_telefono').value||'-'}`,M+3,y+8);
-  y+=18;
+  chk(22);
+  doc.autoTable({
+    ...TS, startY: y,
+    head: [['#','ASUNTO']],
+    body: [
+      ['1.', document.getElementById('ag1').value||'-'],
+      ['2.', document.getElementById('ag2').value||'-'],
+      ['3.', document.getElementById('ag3').value||'-']
+    ],
+    columnStyles: {0: {cellWidth: 15}, 1: {cellWidth: 'auto'}}
+  });
+  y = doc.lastAutoTable.finalY + 6;
   
-  // Notas
-  chk(28);doc.setFillColor(255,248,225);doc.rect(M,y,W-M*2,28,'F');doc.setDrawColor(253,224,71);doc.rect(M,y,W-M*2,28,'S');
-  doc.setTextColor(120,53,15);doc.setFontSize(8.5);
-  doc.text('NOTA: Esta página no se debe pegar en el tablero. Revisen cruces de horario. Alimentos desde miércoles.',M+3,y+7);
-  doc.text('✓ Domingo: informe con Comité de Servicio. Multimedia: JW Hub → Documentos → Archivos multimedia.',M+3,y+14);
-  doc.text('🔗 Direcciones ocultas automáticamente cuando se indica "En el hospedaje".',M+3,y+21);
+  chk(18);
+  doc.setFillColor(232,245,233);
+  doc.rect(M, y, W - M*2, 16, 'F');
+  doc.setTextColor(46,125,50);
+  doc.setFontSize(8);
+  const hospDir = document.getElementById('sc_direccion').value || 'No registrado';
+  const hospTel = document.getElementById('sc_telefono').value || '-';
+  doc.text(`HOSPEDAJE SC: ${hospDir} | TEL: ${hospTel}`, M+3, y+9);
+  y += 20;
   
-  // Footer páginas
-  for(let i=1;i<=doc.internal.getNumberOfPages();i++){doc.setPage(i);doc.setTextColor(150);doc.setFontSize(7);doc.text(`CHI-03 | Gilberto Flores Fabián | Página ${i} de ${doc.internal.getNumberOfPages()}`,W/2,doc.internal.pageSize.getHeight()-6,{align:'center'});}
+  chk(32);
+  doc.setFillColor(255,248,225);
+  doc.setDrawColor(253,224,71);
+  doc.rect(M, y, W - M*2, 32, 'FD');
+  doc.setTextColor(120,53,15);
+  doc.setFontSize(8.5);
+  doc.text('NOTA: Esta página no se debe pegar en el tablero. Revisen cruces de horario. Alimentos desde miércoles.', M+3, y+8);
+  doc.text('✓ Domingo: informe con Comité de Servicio. Multimedia: JW Hub → Documentos → Archivos multimedia.', M+3, y+15);
+  doc.text('🔗 Direcciones ocultas automáticamente cuando se indica "En el hospedaje". v2.0 Mejorada.', M+3, y+22);
   
-  doc.save(`Visita_SC_${con.replace(/\s+/g,'_')}.pdf`);
+  const totalPages = doc.internal.getNumberOfPages();
+  for(let i=1; i<=totalPages; i++){
+    doc.setPage(i);
+    doc.setTextColor(150);
+    doc.setFontSize(7);
+    doc.text(`CHI-03 | Gilberto Flores Fabián | v2.0 | Página ${i} de ${totalPages}`, W/2, doc.internal.pageSize.getHeight()-6, {align:'center'});
+  }
   
-  // WhatsApp
-  const waNum=document.getElementById('wa').value.replace(/\D/g,'')||'526121418717';
-  const msg=encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ ${con}\n📅 ${fec}\n📄 PDF adjunto con programa completo.\n🔗 jw.org/es | hub.jw.org`);
-  window.open(`https://wa.me/${waNum}?text=${msg}`,'_blank');
+  return {doc, cong, fec};
+}
+
+async function gen() {
+  const f = document.getElementById('f');
+  if (!f.checkValidity()) {
+    f.reportValidity();
+    showToast('⚠️ Complete los campos obligatorios marcados con *', 'warning');
+    return;
+  }
+  
+  document.getElementById('loadingOverlay').classList.add('active');
+  
+  try {
+    await new Promise(r => setTimeout(r, 100));
+    const {doc, cong, fec} = await generarPDFData();
+    
+    const nombreArchivo = `Visita_SC_${cong.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'')}.pdf`;
+    doc.save(nombreArchivo);
+    
+    const waNum = document.getElementById('wa').value.replace(/\D/g,'') || '526121418717';
+    const msg = encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n📄 PDF generado correctamente: "${nombreArchivo}"\n\n✅ Revise que todas las direcciones y horarios sean correctos antes de la visita.\n\n🔗 jw.org/es | hub.jw.org`);
+    
+    setTimeout(() => {
+      window.open(`https://wa.me/${waNum}?text=${msg}`, '_blank');
+      document.getElementById('loadingOverlay').classList.remove('active');
+      showToast('✅ PDF generado y WhatsApp abierto', 'success');
+    }, 800);
+    
+  } catch(err) {
+    document.getElementById('loadingOverlay').classList.remove('active');
+    console.error(err);
+    showToast('❌ ' + err.message, 'error');
+  }
+}
+
+async function soloPDF() {
+  document.getElementById('loadingOverlay').classList.add('active');
+  try {
+    await new Promise(r => setTimeout(r, 100));
+    const {doc, cong} = await generarPDFData();
+    const nombreArchivo = `Visita_SC_${cong.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'')}.pdf`;
+    doc.save(nombreArchivo);
+    document.getElementById('loadingOverlay').classList.remove('active');
+    showToast('✅ PDF descargado correctamente', 'success');
+  } catch(err) {
+    document.getElementById('loadingOverlay').classList.remove('active');
+    showToast('❌ ' + err.message, 'error');
+  }
+}
+
+function soloWhatsApp() {
+  const waNum = document.getElementById('wa').value.replace(/\D/g,'') || '526121418717';
+  const cong = document.getElementById('cong').value || '______________';
+  const fec = document.getElementById('fec').value || '______________';
+  const msg = encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n💡 El programa está listo. Se enviará el PDF por este medio.\n\n🔗 jw.org/es`);
+  window.open(`https://wa.me/${waNum}?text=${msg}`, '_blank');
+  showToast('✅ WhatsApp abierto', 'success');
 }
 </script>
 </body>
