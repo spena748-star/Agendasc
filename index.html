@@ -3,2123 +3,1522 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="theme-color" content="#0066cc">
+<meta name="theme-color" content="#1a3a5c">
 <meta name="description" content="Programa de Visita del SC - CHI-03 2026. Herramienta oficial para organizar visitas de Superintendente de Circuito.">
-<title>Programa Visita SC - CHI-03 | v2.0</title>
+<title>Programa SC • CHI-03 v3.0</title>
 
-<!-- Librerías CDN -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 <style>
-:root {
-  --primary: #0066cc;
-  --primary-dark: #004a99;
-  --primary-light: #e3f2fd;
-  --accent: #00c853;
-  --accent-dark: #009624;
-  --warning: #ff9800;
-  --danger: #e53935;
-  --purple: #7c4dff;
-  --bg: #f0f2f5;
-  --surface: #ffffff;
-  --surface-2: #f8f9fa;
-  --text: #1a1a2e;
-  --text-secondary: #5a5a7a;
-  --border: #e0e0e0;
-  --shadow: 0 4px 20px rgba(0,0,0,0.08);
-  --shadow-lg: 0 10px 40px rgba(0,0,0,0.12);
-  --radius: 16px;
-  --radius-sm: 10px;
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+:root{
+  --p:#1a3a5c;--p2:#0f2640;--p3:#e8f2ff;
+  --acc:#00b894;--acc2:#00916e;
+  --war:#f39c12;--dan:#e74c3c;--pur:#6c5ce7;
+  --bg:#f0f4f8;--surf:#fff;--surf2:#f7f9fc;
+  --txt:#0f1923;--txt2:#5a6a7e;--brd:#dde3ec;
+  --sh:0 2px 12px rgba(26,58,92,.09);--shl:0 8px 32px rgba(26,58,92,.15);
+  --r:14px;--rs:9px;--tr:all .25s cubic-bezier(.4,0,.2,1);
+  --font:'DM Sans',system-ui,sans-serif;--font-h:'Syne',system-ui,sans-serif;
 }
+[data-theme=dark]{
+  --p:#5b9cf6;--p2:#3a7bd5;--p3:#0d1f38;
+  --bg:#0a0f1a;--surf:#111827;--surf2:#1a2335;
+  --txt:#e8eef7;--txt2:#8899b3;--brd:#1e2d45;
+  --sh:0 2px 12px rgba(0,0,0,.4);--shl:0 8px 32px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--txt);line-height:1.6;font-size:15px;padding-bottom:120px;transition:background .3s,color .3s}
 
-[data-theme="dark"] {
-  --bg: #0f1117;
-  --surface: #1a1d29;
-  --surface-2: #22263a;
-  --text: #e8eaf6;
-  --text-secondary: #9fa8da;
-  --border: #2d3142;
-  --shadow: 0 4px 20px rgba(0,0,0,0.3);
-  --shadow-lg: 0 10px 40px rgba(0,0,0,0.4);
-  --primary-light: #1a237e;
-}
+/* ANIMATIONS */
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes toast-in{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes toast-out{from{transform:translateX(0);opacity:1}to{transform:translateX(110%);opacity:0}}
+@keyframes pulse-ring{0%,100%{box-shadow:0 0 0 0 rgba(0,184,148,.3)}50%{box-shadow:0 0 0 10px rgba(0,184,148,0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes badge-pop{0%{transform:scale(0)}80%{transform:scale(1.15)}100%{transform:scale(1)}}
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-
-body {
-  font-family: var(--font);
-  background: var(--bg);
-  color: var(--text);
-  line-height: 1.6;
-  font-size: 16px;
-  padding-bottom: 100px;
-  transition: var(--transition);
-}
-
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(0,102,204,0.4); }
-  50% { box-shadow: 0 0 0 12px rgba(0,102,204,0); }
-}
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
-}
-@keyframes toastIn {
-  from { transform: translateX(120%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-@keyframes toastOut {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(120%); opacity: 0; }
-}
-
-.animate-in { animation: fadeInUp 0.5s ease forwards; }
+/* PROGRESS BAR */
+.prog-wrap{position:fixed;top:0;left:0;width:100%;height:3px;background:rgba(0,0,0,.1);z-index:9999}
+.prog-bar{height:100%;background:linear-gradient(90deg,var(--p),var(--acc));transition:width .5s ease;border-radius:2px}
 
 /* HEADER */
-header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: #fff;
-  padding: 28px 20px;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  position: relative;
-  overflow: hidden;
+header{
+  background:linear-gradient(135deg,var(--p2) 0%,var(--p) 60%,#2563eb 100%);
+  color:#fff;padding:32px 20px 56px;position:relative;overflow:hidden;
 }
-
-header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 400px;
-  height: 400px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 50%;
-  pointer-events: none;
+header::before{
+  content:'';position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
-
-header h1 {
-  font-size: 1.6rem;
-  margin-bottom: 6px;
-  font-weight: 800;
-  letter-spacing: -0.5px;
+header::after{
+  content:'';position:absolute;bottom:-2px;left:0;right:0;height:40px;
+  background:var(--bg);border-radius:40px 40px 0 0;
 }
+.header-inner{position:relative;z-index:1;max-width:850px;margin:0 auto}
+header h1{font-family:var(--font-h);font-size:1.7rem;letter-spacing:-0.5px;margin-bottom:4px}
+header p{opacity:.85;font-size:.95rem;font-weight:500}
+.hdr-controls{position:absolute;top:0;right:0;display:flex;gap:8px;z-index:2}
+.hdr-btn{background:rgba(255,255,255,.15);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.25);color:#fff;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:.85rem;font-weight:600;transition:var(--tr);display:flex;align-items:center;gap:5px;font-family:var(--font)}
+.hdr-btn:hover{background:rgba(255,255,255,.28);transform:translateY(-1px)}
+.badge-v{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-top:10px}
 
-header p {
-  opacity: 0.9;
-  font-size: 1rem;
-  font-weight: 500;
+/* CONTAINER */
+.wrap{max-width:850px;margin:0 auto;padding:20px 16px}
+
+/* STATS BAR */
+.stats-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);
+  padding:14px 18px;margin-bottom:16px;box-shadow:var(--sh);
+  animation:up .4s ease forwards;
 }
+.stats-pct{font-family:var(--font-h);font-size:1.4rem;color:var(--p)}
+.stats-sub{font-size:.78rem;color:var(--txt2);margin-top:1px}
+.stats-right{display:flex;gap:12px;align-items:center}
+.stat-pill{background:var(--surf2);border:1px solid var(--brd);padding:6px 12px;border-radius:20px;font-size:.78rem;font-weight:600;color:var(--txt2)}
+.stat-pill.good{background:rgba(0,184,148,.1);color:var(--acc2);border-color:rgba(0,184,148,.3)}
+.stat-pill.warn{background:rgba(243,156,18,.1);color:#c47d10;border-color:rgba(243,156,18,.3)}
+.stat-pill.err{background:rgba(231,76,60,.1);color:#c0392b;border-color:rgba(231,76,60,.3)}
 
-.badge-version {
-  display: inline-block;
-  background: rgba(255,255,255,0.2);
-  backdrop-filter: blur(10px);
-  padding: 4px 14px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  margin-top: 10px;
-  border: 1px solid rgba(255,255,255,0.3);
+/* CONFLICT ALERT */
+.conflict-alert{display:none;background:linear-gradient(135deg,#fff5f5,#ffe0e0);border:2px solid var(--dan);border-radius:var(--r);padding:16px 20px;margin-bottom:16px;animation:up .3s ease}
+.conflict-alert.active{display:block}
+.conflict-alert h4{color:var(--dan);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.conflict-item{font-size:.88rem;color:#7a2020;padding:4px 0;border-bottom:1px solid rgba(231,76,60,.15)}
+.conflict-item:last-child{border:none}
+[data-theme=dark] .conflict-alert{background:linear-gradient(135deg,#2a1010,#3a1515)}
+[data-theme=dark] .conflict-item{color:#e9a0a0}
+
+/* CARDS */
+.card{
+  background:var(--surf);border:1px solid var(--brd);border-radius:var(--r);
+  margin-bottom:14px;box-shadow:var(--sh);overflow:hidden;
+  transition:var(--tr);opacity:0;animation:up .45s ease forwards;
 }
+.card:nth-child(1){animation-delay:.05s}
+.card:nth-child(2){animation-delay:.1s}
+.card:nth-child(3){animation-delay:.15s}
+.card:nth-child(4){animation-delay:.2s}
+.card:nth-child(5){animation-delay:.25s}
+.card:nth-child(6){animation-delay:.3s}
+.card:nth-child(7){animation-delay:.35s}
+.card:nth-child(8){animation-delay:.4s}
+.card:nth-child(9){animation-delay:.45s}
 
-/* CONTROLES SUPERIORES */
-.top-controls {
-  position: fixed;
-  top: 16px;
-  right: 16px;
-  display: flex;
-  gap: 10px;
-  z-index: 100;
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px;cursor:pointer;user-select:none;
+  border-bottom:2px solid transparent;transition:var(--tr);
 }
-
-.top-btn {
-  background: rgba(255,255,255,0.15);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-  padding: 10px 16px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.card-header:hover{background:var(--surf2)}
+.card-header.open{border-bottom-color:var(--brd)}
+.card-title{display:flex;align-items:center;gap:10px;font-family:var(--font-h);font-size:1rem;font-weight:700}
+.card-title-icon{font-size:1.2rem}
+.card-meta{display:flex;align-items:center;gap:8px}
+.card-prog{
+  display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--txt2)
 }
+.mini-bar{width:40px;height:4px;background:var(--brd);border-radius:2px;overflow:hidden}
+.mini-bar-fill{height:100%;background:var(--acc);border-radius:2px;transition:width .4s ease}
+.card-toggle{width:28px;height:28px;border-radius:50%;background:var(--surf2);border:1px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:.85rem;transition:var(--tr);flex-shrink:0}
+.card-header.open .card-toggle{transform:rotate(180deg)}
+.card-body{padding:20px;display:none}
+.card-body.open{display:block;animation:up .3s ease}
 
-.top-btn:hover {
-  background: rgba(255,255,255,0.3);
-  transform: translateY(-2px);
+/* COLOR ACCENTS */
+.acc-blue .card-header{border-left:4px solid var(--p)}
+.acc-green .card-header{border-left:4px solid var(--acc)}
+.acc-purple .card-header{border-left:4px solid var(--pur)}
+.acc-orange .card-header{border-left:4px solid var(--war)}
+.acc-red .card-header{border-left:4px solid var(--dan)}
+
+.acc-blue .card-title{color:var(--p)}
+.acc-green .card-title{color:var(--acc2)}
+.acc-purple .card-title{color:var(--pur)}
+.acc-orange .card-title{color:#c47d10}
+.acc-red .card-title{color:var(--dan)}
+
+/* SECTION BADGE */
+.sec-badge{
+  font-size:.7rem;font-weight:700;padding:3px 8px;border-radius:20px;
+  animation:badge-pop .3s ease;
 }
+.sec-badge.complete{background:rgba(0,184,148,.15);color:var(--acc2)}
+.sec-badge.partial{background:rgba(243,156,18,.15);color:#c47d10}
+.sec-badge.empty{background:var(--surf2);color:var(--txt2)}
 
-/* CONTENEDOR */
-.container {
-  max-width: 850px;
-  margin: 0 auto;
-  padding: 24px 16px;
+/* FORMS */
+label{display:block;font-size:.82rem;font-weight:600;margin-bottom:5px;color:var(--txt2)}
+input,select,textarea{
+  width:100%;padding:12px 14px;border:2px solid var(--brd);border-radius:var(--rs);
+  font-size:.95rem;margin-bottom:12px;background:var(--surf);color:var(--txt);
+  transition:var(--tr);font-family:var(--font);min-height:44px;
 }
-
-/* TARJETAS */
-.card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-  transition: var(--transition);
-  position: relative;
-  overflow: hidden;
-  animation: fadeInUp 0.5s ease forwards;
-  opacity: 0;
-}
-
-.card:nth-child(1) { animation-delay: 0.05s; }
-.card:nth-child(2) { animation-delay: 0.1s; }
-.card:nth-child(3) { animation-delay: 0.15s; }
-.card:nth-child(4) { animation-delay: 0.2s; }
-.card:nth-child(5) { animation-delay: 0.25s; }
-.card:nth-child(6) { animation-delay: 0.3s; }
-
-.card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-.card-accent { border-left: 5px solid var(--primary); }
-.card-green { border-left-color: var(--accent); }
-.card-purple { border-left-color: var(--purple); }
-.card-orange { border-left-color: var(--warning); }
-.card-red { border-left-color: var(--danger); }
-
-.card h3 {
-  font-size: 1.2rem;
-  margin-bottom: 18px;
-  color: var(--primary);
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.card-green h3 { color: var(--accent-dark); }
-.card-purple h3 { color: var(--purple); }
-.card-orange h3 { color: #e65100; }
-
-/* FORMULARIOS */
-label {
-  display: block;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin-bottom: 6px;
-  color: var(--text-secondary);
-  transition: var(--transition);
-}
-
-input, select, textarea {
-  width: 100%;
-  padding: 14px 16px;
-  border: 2px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-size: 1rem;
-  margin-bottom: 14px;
-  background: var(--surface);
-  color: var(--text);
-  transition: var(--transition);
-  font-family: var(--font);
-  min-height: 48px;
-}
-
-input:focus, select:focus, textarea:focus {
-  border-color: var(--primary);
-  outline: none;
-  box-shadow: 0 0 0 4px var(--primary-light);
-}
-
-input.valid { border-color: var(--accent); }
-input.invalid { border-color: var(--danger); animation: shake 0.4s ease; }
-
-textarea { resize: vertical; min-height: 80px; }
-
-select {
-  cursor: pointer;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  background-size: 18px;
-  padding-right: 40px;
-}
-
-.small-text {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  display: block;
-  margin-top: -10px;
-  margin-bottom: 12px;
-}
+input:focus,select:focus,textarea:focus{border-color:var(--p);outline:none;box-shadow:0 0 0 3px var(--p3)}
+input.ok{border-color:var(--acc)}
+input.err{border-color:var(--dan);animation:shake .35s ease}
+textarea{resize:vertical;min-height:72px}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%235a6a7e' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;background-size:16px;padding-right:36px}
+.hint{color:var(--txt2);font-size:.78rem;display:block;margin-top:-8px;margin-bottom:10px}
 
 /* GRIDS */
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-.grid-5 {
-  display: grid;
-  grid-template-columns: 90px repeat(4, 1fr);
-  gap: 8px;
-  align-items: end;
-  margin-bottom: 10px;
-  padding: 14px;
-  background: var(--surface-2);
-  border-radius: var(--radius-sm);
-  transition: var(--transition);
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g5{
+  display:grid;grid-template-columns:80px repeat(4,1fr);gap:8px;align-items:end;
+  padding:14px;background:var(--surf2);border-radius:var(--rs);margin-bottom:8px;
+  transition:var(--tr);
 }
-.grid-5:hover { background: var(--primary-light); }
+.g5:hover{background:var(--p3)}
+[data-theme=dark] .g5:hover{background:rgba(91,156,246,.08)}
+.day-label{font-weight:700;font-size:.85rem;text-transform:uppercase;letter-spacing:.5px;color:var(--txt);padding-top:26px}
 
-.day {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text);
-  padding-top: 28px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* BUTTONS */
+.btn{
+  width:100%;padding:16px;background:linear-gradient(135deg,var(--acc),var(--acc2));
+  color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;
+  cursor:pointer;margin-top:10px;min-height:52px;transition:var(--tr);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  font-family:var(--font);
 }
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,184,148,.35)}
+.btn:active{transform:translateY(0)}
+.btn-blue{background:linear-gradient(135deg,var(--p),var(--p2))}
+.btn-blue:hover{box-shadow:0 6px 20px rgba(26,58,92,.35)}
+.btn-orange{background:linear-gradient(135deg,var(--war),#d68910)}
+.btn-orange:hover{box-shadow:0 6px 20px rgba(243,156,18,.35)}
+.btn-ghost{background:transparent;border:2px dashed var(--p);color:var(--p)}
+.btn-ghost:hover{background:var(--p3);border-style:solid;box-shadow:none}
+.btn-sm{padding:9px 14px;font-size:.83rem;min-height:38px;border-radius:9px;width:auto;display:inline-flex;margin-top:0}
+.btn-maps{background:linear-gradient(135deg,#4285f4,#3367d6);color:#fff;border:none;padding:10px 14px;border-radius:9px;cursor:pointer;font-size:.82rem;font-weight:600;transition:var(--tr);display:inline-flex;align-items:center;gap:5px;font-family:var(--font)}
+.btn-maps:hover{transform:scale(1.03)}
+.btn-wa{background:linear-gradient(135deg,#25d366,#128c7e);color:#fff;border:none;padding:10px 14px;border-radius:9px;cursor:pointer;font-size:.82rem;font-weight:600;transition:var(--tr);font-family:var(--font);display:inline-flex;align-items:center;gap:5px}
+.btn-wa:hover{transform:scale(1.03)}
+.btn-del{background:#fff0ef;color:var(--dan);border:none;padding:7px 12px;border-radius:7px;cursor:pointer;font-size:.78rem;font-weight:700;transition:var(--tr);position:absolute;top:12px;right:12px}
+.btn-del:hover{background:var(--dan);color:#fff}
 
-/* BOTONES */
-.btn {
-  width: 100%;
-  padding: 18px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
-  color: #fff;
-  border: none;
-  border-radius: 14px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  margin-top: 12px;
-  min-height: 56px;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  position: relative;
-  overflow: hidden;
+/* HOSPEDAJE */
+.hosp-box{
+  background:linear-gradient(135deg,#e8f9f4,#d0f0e6);
+  border:2px solid rgba(0,184,148,.4);padding:18px;border-radius:var(--rs);
 }
+[data-theme=dark] .hosp-box{background:linear-gradient(135deg,#0a2e22,#0f3d2e);border-color:rgba(0,184,148,.3)}
+.hosp-badge{display:inline-flex;align-items:center;gap:5px;background:var(--acc);color:#fff;padding:6px 12px;border-radius:20px;font-size:.78rem;font-weight:700;margin-top:6px}
+.maps-link{color:var(--p);text-decoration:none;font-size:.82rem;font-weight:600;display:inline-flex;align-items:center;gap:4px;padding:5px 0;transition:var(--tr)}
+.maps-link:hover{color:var(--p2);text-decoration:underline}
+.dir-hide{display:none}
+.dir-hide.show{display:block;animation:up .25s ease}
 
-.btn::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255,255,255,0.2);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  transition: width 0.6s, height 0.6s;
+/* NOTES */
+.note{
+  background:linear-gradient(135deg,#fffbeb,#fef3c7);border-left:4px solid var(--war);
+  padding:14px 16px;border-radius:0 var(--rs) var(--rs) 0;font-size:.88rem;
+  color:#7a4f00;line-height:1.7;margin:14px 0;
 }
-
-.btn:active::after {
-  width: 300px;
-  height: 300px;
+[data-theme=dark] .note{background:linear-gradient(135deg,#2e1f00,#3a2800);color:#f0c060}
+.mm-box{
+  background:linear-gradient(135deg,var(--p3),#dbeafe);border-left:4px solid var(--p);
+  padding:18px;border-radius:0 var(--rs) var(--rs) 0;font-size:.88rem;color:var(--p2);line-height:1.8;
 }
-
-.btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(0,200,83,0.35);
-}
-
-.btn:active { transform: translateY(-1px); }
-
-.btn-secondary {
-  background: linear-gradient(135deg, var(--warning) 0%, #f57c00 100%);
-}
-
-.btn-secondary:hover {
-  box-shadow: 0 8px 25px rgba(255,152,0,0.35);
-}
-
-.btn-outline {
-  background: transparent;
-  border: 2px dashed var(--primary);
-  color: var(--primary);
-}
-
-.btn-outline:hover {
-  background: var(--primary-light);
-  border-style: solid;
-}
-
-.btn-sm {
-  padding: 10px 16px;
-  font-size: 0.9rem;
-  min-height: 42px;
-  border-radius: 10px;
-  width: auto;
-  display: inline-flex;
-}
-
-.btn-maps {
-  background: linear-gradient(135deg, #4285f4 0%, #3367d6 100%);
-  color: #fff;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.btn-maps:hover { transform: scale(1.03); box-shadow: 0 4px 15px rgba(66,133,244,0.3); }
-
-.btn-whatsapp {
-  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
-  color: #fff;
-  border: none;
-  padding: 12px 18px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: var(--transition);
-}
-
-.btn-whatsapp:hover { transform: scale(1.03); }
-
-.btn-remove {
-  background: #ffebee;
-  color: var(--danger);
-  border: none;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  font-weight: 600;
-  transition: var(--transition);
-  position: absolute;
-  top: 14px;
-  right: 14px;
-}
-
-.btn-remove:hover { background: var(--danger); color: #fff; }
-
-/* SECCIONES ESPECIALES */
-.ubicacion-box {
-  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-  border: 2px solid var(--accent);
-  padding: 20px;
-  border-radius: var(--radius-sm);
-  margin-bottom: 10px;
-}
-
-[data-theme="dark"] .ubicacion-box {
-  background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
-  border-color: var(--accent);
-}
-
-.contacto-box {
-  background: var(--primary-light);
-  border: 2px solid var(--primary);
-  padding: 14px;
-  border-radius: 10px;
-  margin-top: 10px;
-  font-size: 0.9rem;
-  line-height: 1.6;
-}
-
-.note {
-  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
-  border: 2px solid #ffd54f;
-  border-left: 5px solid var(--warning);
-  padding: 20px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: 0.95rem;
-  color: #7a5c00;
-  margin: 20px 0;
-  line-height: 1.7;
-}
-
-[data-theme="dark"] .note {
-  background: linear-gradient(135deg, #3e2723 0%, #4e342e 100%);
-  color: #ffe0b2;
-  border-color: #ff9800;
-}
-
-.mm {
-  background: linear-gradient(135deg, var(--primary-light) 0%, #bbdefb 100%);
-  border-left: 5px solid var(--primary);
-  padding: 22px;
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: 0.92rem;
-  color: var(--primary-dark);
-  margin: 20px 0;
-  line-height: 1.7;
-}
-
-[data-theme="dark"] .mm {
-  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-  color: #c5cae9;
-}
-
-.mm strong { display: block; margin-bottom: 6px; font-size: 1.05rem; color: var(--primary-dark); }
-
-.direccion-hospedaje { display: none; }
-.direccion-hospedaje.visible { display: block; animation: fadeIn 0.3s ease; }
-
-.hospedaje-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--accent);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  margin-top: 8px;
-}
+[data-theme=dark] .mm-box{background:linear-gradient(135deg,#0d1f38,#142d52);color:#93c5fd}
 
 /* ADMIN */
-.admin-section {
-  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-  border: 3px solid var(--warning);
-  padding: 24px;
-  border-radius: var(--radius);
-  margin-bottom: 24px;
-  display: none;
-  animation: slideDown 0.3s ease;
+.admin-wrap{background:linear-gradient(135deg,#fff8e1,#ffecc2);border:2px solid var(--war);border-radius:var(--r);padding:20px;margin-bottom:14px;display:none;animation:up .3s ease}
+[data-theme=dark] .admin-wrap{background:linear-gradient(135deg,#2a1f00,#3a2a00)}
+.admin-wrap.open{display:block}
+.tema-box{background:var(--surf);border:2px solid #fdd97a;padding:14px;border-radius:var(--rs);margin-bottom:12px}
+.tema-box label{color:#b45309;font-weight:700}
+.tema-box input,.tema-box textarea{border:1px solid #fce68a;background:#fffbf0;color:var(--txt);width:100%;margin-top:6px;padding:10px}
+.tema-box small{color:var(--txt2);font-size:.75rem;margin-top:4px;display:block}
+
+/* QUICK NAV */
+.qnav{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--surf);border:1px solid var(--brd);border-radius:50px;
+  padding:8px 12px;box-shadow:var(--shl);display:flex;gap:4px;z-index:999;
 }
-
-[data-theme="dark"] .admin-section {
-  background: linear-gradient(135deg, #3e2723 0%, #4e342e 100%);
+.qnav-btn{
+  background:none;border:none;color:var(--txt2);cursor:pointer;padding:8px 10px;
+  border-radius:40px;font-size:1.1rem;transition:var(--tr);display:flex;flex-direction:column;align-items:center;gap:2px;
 }
-
-.admin-section.active { display: block; }
-
-.admin-section h3 {
-  color: #e65100;
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.tema-input {
-  background: var(--surface);
-  border: 2px solid var(--warning);
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 14px;
-}
-
-.tema-input label { color: #e65100; font-size: 0.95rem; font-weight: 700; }
-
-.tema-input input, .tema-input textarea {
-  width: 100%;
-  padding: 12px;
-  border: 2px solid #ffd54f;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  margin-top: 8px;
-  background: #fff8e1;
-  color: var(--text);
-}
-
-.tema-input textarea { min-height: 70px; resize: vertical; }
-
-.tema-input small { display: block; margin-top: 6px; color: var(--text-secondary); font-size: 0.8rem; }
-
-.badge-admin {
-  display: inline-block;
-  background: var(--warning);
-  color: #fff;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  margin-left: 10px;
-}
-
-.maps-link {
-  color: var(--primary);
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  padding: 8px 0;
-  transition: var(--transition);
-}
-
-.maps-link:hover { color: var(--primary-dark); text-decoration: underline; }
-
-/* TIMELINE */
-.timeline {
-  display: flex;
-  justify-content: space-between;
-  margin: 20px 0;
-  position: relative;
-  padding: 0 10px;
-}
-
-.timeline::before {
-  content: '';
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  right: 20px;
-  height: 4px;
-  background: var(--border);
-  border-radius: 2px;
-  z-index: 0;
-}
-
-.timeline-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  z-index: 1;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.timeline-dot {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 3px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.2rem;
-  transition: var(--transition);
-}
-
-.timeline-item:hover .timeline-dot { transform: scale(1.15); border-color: var(--primary); }
-.timeline-item.active .timeline-dot { background: var(--primary); border-color: var(--primary); color: #fff; }
-.timeline-item.completed .timeline-dot { background: var(--accent); border-color: var(--accent); color: #fff; }
-
-.timeline-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-align: center; }
-
-/* PROGRESO */
-.progress-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: rgba(0,0,0,0.1);
-  z-index: 9999;
-}
-
-.progress-bar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
-  transition: width 0.4s ease;
-  width: 0%;
-}
-
-.progress-stats {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--surface);
-  padding: 14px 18px;
-  border-radius: var(--radius-sm);
-  margin-bottom: 20px;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--border);
-}
-
-.progress-stats-text { font-weight: 700; color: var(--primary); font-size: 0.95rem; }
-.progress-stats-sub { font-size: 0.8rem; color: var(--text-secondary); }
+.qnav-btn span.lbl{font-size:.58rem;font-weight:600;color:var(--txt2)}
+.qnav-btn:hover,.qnav-btn.active{background:var(--p3);color:var(--p)}
+[data-theme=dark] .qnav-btn:hover,[data-theme=dark] .qnav-btn.active{background:rgba(91,156,246,.15)}
+.qnav-divider{width:1px;background:var(--brd);margin:4px 0}
 
 /* TOAST */
-.toast-container {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  z-index: 10000;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  max-width: 360px;
+.toast-ct{position:fixed;top:16px;right:16px;z-index:10000;display:flex;flex-direction:column;gap:8px;max-width:320px}
+.toast{
+  background:var(--surf);border-left:4px solid var(--p);padding:13px 16px;
+  border-radius:10px;box-shadow:var(--shl);display:flex;align-items:center;gap:10px;
+  animation:toast-in .35s ease forwards;font-size:.88rem;font-weight:500;
 }
-
-.toast {
-  background: var(--surface);
-  border-left: 4px solid var(--primary);
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  animation: toastIn 0.4s ease forwards;
-  font-size: 0.95rem;
-  font-weight: 500;
-}
-
-.toast.success { border-left-color: var(--accent); }
-.toast.error { border-left-color: var(--danger); }
-.toast.warning { border-left-color: var(--warning); }
-
-.toast-close {
-  margin-left: auto;
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  color: var(--text-secondary);
-  padding: 0 4px;
-}
-
-/* MODALES */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: none;
-  z-index: 1001;
-  backdrop-filter: blur(6px);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.modal-overlay.active { display: flex; opacity: 1; }
-
-.modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.95);
-  background: var(--surface);
-  width: 92%;
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  z-index: 1002;
-  display: none;
-  opacity: 0;
-  transition: all 0.3s ease;
-  border: 1px solid var(--border);
-}
-
-.modal.active { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
-
-.modal-header {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: #fff;
-  padding: 24px;
-  border-radius: var(--radius) var(--radius) 0 0;
-  text-align: center;
-  position: relative;
-}
-
-.modal-header h2 { margin: 0; font-size: 1.4rem; }
-
-.modal-close {
-  position: absolute;
-  top: 16px;
-  right: 20px;
-  background: rgba(255,255,255,0.2);
-  border: none;
-  color: #fff;
-  font-size: 1.8rem;
-  cursor: pointer;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
-}
-
-.modal-close:hover { background: rgba(255,255,255,0.35); transform: rotate(90deg); }
-
-.modal-body { padding: 24px; }
-
-.password-modal { max-width: 420px; padding: 32px; text-align: center; }
-
-.password-modal h3 { color: #e65100; font-size: 1.4rem; margin-bottom: 20px; }
-
-.password-modal input {
-  width: 100%;
-  padding: 16px;
-  border: 3px solid var(--warning);
-  border-radius: 12px;
-  font-size: 1.2rem;
-  text-align: center;
-  margin-bottom: 16px;
-  letter-spacing: 3px;
-  background: var(--surface);
-  color: var(--text);
-}
-
-.password-modal .hint { color: var(--text-secondary); font-size: 0.85rem; margin-top: 16px; font-style: italic; }
+.toast.ok{border-left-color:var(--acc)}
+.toast.er{border-left-color:var(--dan)}
+.toast.wa{border-left-color:var(--war)}
+.toast-x{margin-left:auto;background:none;border:none;font-size:1.1rem;cursor:pointer;color:var(--txt2);padding:0 2px;line-height:1}
 
 /* LOADING */
-.loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(8px);
-  display: none;
-  z-index: 2000;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
+.loading{
+  position:fixed;inset:0;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);
+  display:none;z-index:2000;flex-direction:column;align-items:center;justify-content:center;gap:18px;
 }
+[data-theme=dark] .loading{background:rgba(10,15,26,.92)}
+.loading.on{display:flex}
+.spinner{width:52px;height:52px;border:4px solid var(--brd);border-top-color:var(--p);border-radius:50%;animation:spin .7s linear infinite}
+.loading-t{color:var(--p);font-weight:700;font-size:1.05rem;font-family:var(--font-h)}
+.loading-s{color:var(--txt2);font-size:.85rem}
 
-.loading-overlay.active { display: flex; }
-
-.spinner {
-  width: 64px;
-  height: 64px;
-  border: 5px solid var(--border);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+/* MODAL */
+.m-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;z-index:1001;backdrop-filter:blur(5px)}
+.m-overlay.on{display:flex}
+.modal{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.95);
+  background:var(--surf);width:92%;max-width:680px;max-height:90vh;overflow-y:auto;
+  border-radius:var(--r);box-shadow:var(--shl);z-index:1002;display:none;
+  border:1px solid var(--brd);transition:all .3s ease;
 }
+.modal.on{display:block;transform:translate(-50%,-50%) scale(1)}
+.m-head{background:linear-gradient(135deg,var(--p2),var(--p));color:#fff;padding:22px;border-radius:var(--r) var(--r) 0 0;position:relative;text-align:center}
+.m-head h2{font-family:var(--font-h);font-size:1.3rem}
+.m-x{position:absolute;top:14px;right:16px;background:rgba(255,255,255,.18);border:none;color:#fff;font-size:1.5rem;cursor:pointer;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:var(--tr)}
+.m-x:hover{background:rgba(255,255,255,.3);transform:rotate(90deg)}
+.m-body{padding:22px}
 
-.loading-text {
-  color: var(--primary);
-  font-weight: 700;
-  font-size: 1.15rem;
-  text-align: center;
-}
+/* PASSWORD MODAL */
+.pw-modal{max-width:400px;padding:28px;text-align:center}
+.pw-modal h3{font-family:var(--font-h);color:#c47d10;font-size:1.3rem;margin-bottom:14px}
+.pw-input{width:100%;padding:14px;border:2px solid var(--war);border-radius:10px;font-size:1.1rem;text-align:center;letter-spacing:3px;background:var(--surf);color:var(--txt);font-family:var(--font)}
+.pw-err{color:var(--dan);font-weight:700;font-size:.88rem;display:none;margin-top:10px}
+.pw-hint{color:var(--txt2);font-size:.78rem;margin-top:12px;font-style:italic}
 
-.loading-sub {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
+/* PREVIEW MODAL */
+.prev-section{margin-bottom:18px}
+.prev-section h4{font-family:var(--font-h);color:var(--p);border-bottom:2px solid var(--p3);padding-bottom:6px;margin-bottom:10px;font-size:.95rem}
+.prev-row{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--brd);font-size:.85rem}
+.prev-row:last-child{border:none}
+.prev-label{font-weight:700;color:var(--txt2);flex-shrink:0;width:110px}
+.prev-val{color:var(--txt);flex:1}
+.prev-val.missing{color:var(--dan);font-style:italic}
 
 /* CHECKLIST */
-.checklist-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  background: var(--surface-2);
-  border-radius: 10px;
-  margin-bottom: 8px;
-  cursor: pointer;
-  transition: var(--transition);
-  border: 2px solid transparent;
-}
+.chk-item{display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(--surf2);border-radius:var(--rs);margin-bottom:7px;cursor:pointer;transition:var(--tr);border:2px solid transparent}
+.chk-item:hover{border-color:var(--p)}
+.chk-item input[type=checkbox]{width:20px;height:20px;accent-color:var(--p);cursor:pointer;flex-shrink:0}
+.chk-item.done{opacity:.5;text-decoration:line-through}
 
-.checklist-item:hover { border-color: var(--primary); }
+/* VISITS */
+.vis-item{margin-bottom:12px;padding:16px;background:var(--surf2);border-radius:var(--rs);position:relative;border-left:4px solid var(--p);animation:up .3s ease}
 
-.checklist-item input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary); cursor: pointer; }
+/* SHARE */
+.share-box{background:var(--p3);border:1px solid rgba(26,58,92,.2);border-radius:var(--rs);padding:12px;margin-top:10px}
+.share-url{font-family:monospace;font-size:.75rem;color:var(--p);word-break:break-all;margin-bottom:8px}
 
-.checklist-item.checked { opacity: 0.6; text-decoration: line-through; }
+/* ALIMENTOS */
+.meal-day{margin-bottom:18px;padding:16px;background:var(--surf2);border-radius:var(--rs);border-left:4px solid var(--war)}
+.meal-block{background:var(--surf);padding:14px;border-radius:var(--rs);margin-bottom:10px}
+.meal-label{font-size:.82rem;font-weight:700;color:var(--war);margin-bottom:8px}
+
+/* TOOLS ROW */
+.tools-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+
+/* TIMELINE */
+.timeline{display:flex;justify-content:space-between;position:relative;padding:0 10px;margin:10px 0}
+.timeline::before{content:'';position:absolute;top:22px;left:20px;right:20px;height:3px;background:var(--brd);border-radius:2px}
+.tl-item{display:flex;flex-direction:column;align-items:center;gap:6px;z-index:1;cursor:pointer;transition:var(--tr)}
+.tl-dot{width:44px;height:44px;border-radius:50%;background:var(--surf);border:3px solid var(--brd);display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:var(--tr)}
+.tl-item:hover .tl-dot{border-color:var(--p);transform:scale(1.1)}
+.tl-item.done .tl-dot{background:var(--acc);border-color:var(--acc);color:#fff}
+.tl-item.now .tl-dot{background:var(--p);border-color:var(--p);color:#fff;animation:pulse-ring 2s infinite}
+.tl-label{font-size:.7rem;font-weight:700;color:var(--txt2);text-align:center}
+
+/* REUNIONES */
+.reunion-block{padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid var(--brd)}
+.reunion-block:last-child{border:none;padding-bottom:0;margin-bottom:0}
+.reunion-day-label{font-weight:800;font-size:.88rem;text-transform:uppercase;letter-spacing:.5px;color:var(--p);margin-bottom:12px;padding:8px 12px;background:var(--p3);border-radius:var(--rs);display:inline-block}
+
+/* HIDDEN */
+.hidden{display:none!important}
+.flex{display:flex}
+.gap-2{gap:8px}
+.mt-2{margin-top:8px}
+.mt-4{margin-top:16px}
+.text-center{text-align:center}
+
+/* SCROLL */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--brd);border-radius:3px}
+:focus-visible{outline:2px solid var(--p);outline-offset:2px}
+::selection{background:var(--p3);color:var(--p2)}
 
 /* RESPONSIVE */
-@media (max-width: 680px) {
-  .grid-5, .grid-4, .grid-2, .grid-3 { grid-template-columns: 1fr; }
-  .day { background: var(--surface-2); padding: 10px; border-radius: 8px; margin-bottom: 8px; }
-  .timeline { overflow-x: auto; gap: 20px; padding-bottom: 10px; }
-  .timeline::before { display: none; }
-  body { font-size: 15px; }
-  .card { padding: 18px; }
-  header h1 { font-size: 1.3rem; }
-  .top-controls { top: 10px; right: 10px; }
-  .top-btn { padding: 8px 12px; font-size: 0.8rem; }
-  .modal { width: 95%; max-height: 95vh; }
+@media(max-width:640px){
+  .g2,.g3,.g5{grid-template-columns:1fr}
+  .day-label{padding-top:0;background:var(--p3);padding:8px 10px;border-radius:var(--rs);margin-bottom:6px}
+  .qnav{bottom:10px;padding:6px 8px;gap:2px}
+  .qnav-btn{padding:6px 8px}
+  .qnav-btn .lbl{display:none}
+  header h1{font-size:1.35rem}
+  .hdr-controls{position:relative;top:auto;right:auto;justify-content:center;padding-top:12px}
+  .hdr-btn{font-size:.75rem;padding:7px 10px}
+  .stats-right{display:none}
 }
-
-/* UTILIDADES */
-.hidden { display: none !important; }
-.flex { display: flex; }
-.gap-2 { gap: 8px; }
-.gap-4 { gap: 16px; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.mt-2 { margin-top: 8px; }
-.mt-4 { margin-top: 16px; }
-.mb-2 { margin-bottom: 8px; }
-.text-center { text-align: center; }
-.text-sm { font-size: 0.875rem; }
-.text-xs { font-size: 0.75rem; }
-.font-bold { font-weight: 700; }
-.w-full { width: 100%; }
-
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--text-secondary); }
-
-:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-
-::selection { background: var(--primary-light); color: var(--primary-dark); }
 </style>
 </head>
-
 <body>
 
-<div class="progress-container">
-  <div class="progress-bar" id="progressBar"></div>
-</div>
-
-<div class="toast-container" id="toastContainer"></div>
-
-<div class="loading-overlay" id="loadingOverlay">
-  <div class="spinner"></div>
-  <div class="loading-text">Generando PDF profesional...</div>
-  <div class="loading-sub">Esto solo tomará unos segundos</div>
-</div>
+<div class="prog-wrap"><div class="prog-bar" id="progBar"></div></div>
+<div class="toast-ct" id="toastCt"></div>
+<div class="loading" id="loading"><div class="spinner"></div><div class="loading-t">Generando PDF…</div><div class="loading-s">Esto tardará unos segundos</div></div>
 
 <header>
-  <div class="top-controls">
-    <button class="top-btn" onclick="toggleTheme()" title="Cambiar tema">🌓 Tema</button>
-    <button class="top-btn" onclick="mostrarLoginAdmin()" title="Administrador">🔐 Admin</button>
+  <div class="header-inner">
+    <div class="hdr-controls">
+      <button class="hdr-btn" onclick="toggleTheme()">🌓 Tema</button>
+      <button class="hdr-btn" onclick="openAdmin()">🔐 Admin</button>
+      <button class="hdr-btn" onclick="openPreview()">👁️ Vista previa</button>
+      <button class="hdr-btn" onclick="shareURL()">🔗 Compartir</button>
+    </div>
+    <h1>📋 Programa de Visita del SC</h1>
+    <p>CHI-03 • Marzo – Agosto 2026 | Gilberto Flores Fabián</p>
+    <div class="badge-v">✨ Versión 3.0 &nbsp;·&nbsp; Auto-guardado &nbsp;·&nbsp; Detección de conflictos</div>
   </div>
-  <h1>📋 Programa de Visita del SC</h1>
-  <p>CHI-03 • Marzo a Agosto 2026</p>
-  <span class="badge-version">✨ Versión 2.0 Mejorada</span>
 </header>
 
-<div class="container">
+<div class="wrap">
 
-  <div class="progress-stats animate-in">
-    <div>
-      <div class="progress-stats-text" id="progressText">0% Completado</div>
-      <div class="progress-stats-sub">Complete los campos obligatorios marcados con *</div>
-    </div>
-    <div style="text-align:right">
-      <div class="progress-stats-text" id="fieldsCount">0/0 campos</div>
-      <div class="progress-stats-sub">Guardado automático activado 💾</div>
-    </div>
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div>
+    <div class="stats-pct" id="pctText">0%</div>
+    <div class="stats-sub">completado · guardado automático 💾</div>
   </div>
-
-  <div class="card animate-in">
-    <h3>📅 Línea de Tiempo de la Visita</h3>
-    <div class="timeline" id="timelineVis">
-      <div class="timeline-item" data-day="0">
-        <div class="timeline-dot">🛬</div>
-        <div class="timeline-label">Llegada</div>
-      </div>
-      <div class="timeline-item" data-day="1">
-        <div class="timeline-dot">📖</div>
-        <div class="timeline-label">Martes</div>
-      </div>
-      <div class="timeline-item" data-day="2">
-        <div class="timeline-dot">🙋</div>
-        <div class="timeline-label">Miércoles</div>
-      </div>
-      <div class="timeline-item" data-day="3">
-        <div class="timeline-dot">📢</div>
-        <div class="timeline-label">Jueves</div>
-      </div>
-      <div class="timeline-item" data-day="4">
-        <div class="timeline-dot">👔</div>
-        <div class="timeline-label">Viernes</div>
-      </div>
-      <div class="timeline-item" data-day="5">
-        <div class="timeline-dot">🎤</div>
-        <div class="timeline-label">Sábado</div>
-      </div>
-      <div class="timeline-item" data-day="6">
-        <div class="timeline-dot">✈️</div>
-        <div class="timeline-label">Salida</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="admin-section" id="adminSection">
-    <h3>🔐 Configuración de Temas de Discursos <span class="badge-admin">MODO ADMIN</span></h3>
-    <p style="margin-bottom:16px;color:var(--text-secondary);font-size:0.9rem">Estos temas aparecerán en el PDF generado. Modifíquelos según las indicaciones del SC.</p>
-    
-    <div class="tema-input">
-      <label>Martes - 1er Discurso</label>
-      <textarea id="tema_martes">¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?</textarea>
-      <small>🎵 Canción 76</small>
-    </div>
-    
-    <div class="tema-input">
-      <label>Miércoles/Sábado - Precursores</label>
-      <textarea id="tema_miercoles">SIGA ADELANTE HACIA LA META (Fil. 3:14)</textarea>
-    </div>
-    
-    <div class="tema-input">
-      <label>Viernes - Ancianos/SM</label>
-      <textarea id="tema_viernes">SIGAN PROGRESANDO "COMO REGALOS" DE DIOS (Ef 4:8)</textarea>
-    </div>
-    
-    <div class="tema-input">
-      <label>Sábado/Domingo - Discurso Público</label>
-      <textarea id="tema_sabado">CÓMO COSECHAR VIDA ETERNA</textarea>
-      <small>🎵 Canción 145</small>
-    </div>
-    
-    <div class="tema-input">
-      <label>2do Discurso - Servicio</label>
-      <textarea id="tema_2do">"JEHOVÁ NO RETENDRÁ NADA BUENO..."</textarea>
-      <small>🎵 Canción 155</small>
-    </div>
-    
-    <div class="grid-2" style="margin-top:20px">
-      <button type="button" class="btn btn-secondary" onclick="guardarTemas()">💾 Guardar Cambios</button>
-      <button type="button" class="btn" style="background:#757575" onclick="restaurarTemas()">↩️ Restaurar Originales</button>
-    </div>
-  </div>
-
-  <div class="flex gap-2" style="margin-bottom:16px;flex-wrap:wrap">
-    <button class="btn btn-sm btn-outline" onclick="exportarDatos()">📤 Exportar Datos</button>
-    <button class="btn btn-sm btn-outline" onclick="document.getElementById('importFile').click()">📥 Importar Datos</button>
-    <input type="file" id="importFile" class="hidden" accept=".json" onchange="importarDatos(this)">
-    <button class="btn btn-sm btn-outline" onclick="limpiarFormulario()">🧹 Limpiar Todo</button>
-  </div>
-
-  <form id="f">
-    
-    <div class="card card-green animate-in">
-      <h3>📍 Ubicación del SC (Hospedaje)</h3>
-      <div class="ubicacion-box">
-        <div class="grid-2">
-          <div>
-            <label>Dirección del Hospedaje *</label>
-            <input id="sc_direccion" required placeholder="Ej. Calle Principal 123, Colonia Centro, Ciudad Juárez" oninput="actualizarPreviewMaps('sc_direccion','preview_sc')">
-            <div id="preview_sc" style="margin-top:4px"></div>
-          </div>
-          <div>
-            <label>Teléfono de Contacto Local *</label>
-            <input id="sc_telefono" required placeholder="Ej. 656 123 4567">
-          </div>
-        </div>
-        <div class="mt-2">
-          <button type="button" class="btn-maps" onclick="abrirMaps('sc_direccion')" style="width:100%">🗺️ Ver en Google Maps</button>
-        </div>
-      </div>
-    </div>
-
-    <div class="card card-accent animate-in">
-      <h3>⚙️ Configuración General</h3>
-      <div class="grid-2">
-        <div><label>Congregación *</label><input id="cong" required placeholder="Ej. Juárez Centro"></div>
-        <div><label>Fechas de Visita *</label><input id="fec" required placeholder="Ej. 15/03 al 20/03"></div>
-      </div>
-      <label class="mt-2">📱 WhatsApp del SC (código país, sin +)</label>
-      <input id="wa" value="526121418717" placeholder="Ej. 526121418717">
-      <small class="small-text">💡 Formato: México = 52 + número de 10 dígitos</small>
-    </div>
-
-    <div class="card animate-in">
-      <h3>✅ Checklist de Preparación</h3>
-      <div id="checklist">
-        <label class="checklist-item" onclick="toggleChecklist(this)">
-          <input type="checkbox"> <span>Confirmar hospedaje del SC</span>
-        </label>
-        <label class="checklist-item" onclick="toggleChecklist(this)">
-          <input type="checkbox"> <span>Verificar horarios del Salón del Reino</span>
-        </label>
-        <label class="checklist-item" onclick="toggleChecklist(this)">
-          <input type="checkbox"> <span>Coordinar alimentos (desde miércoles)</span>
-        </label>
-        <label class="checklist-item" onclick="toggleChecklist(this)">
-          <input type="checkbox"> <span>Preparar multimedia (JW Hub)</span>
-        </label>
-        <label class="checklist-item" onclick="toggleChecklist(this)">
-          <input type="checkbox"> <span>Confirmar hermanos para predicar con el SC</span>
-        </label>
-        <label class="checklist-item" onclick="toggleChecklist(this)">
-          <input type="checkbox"> <span>Revisar que no haya cruces de horarios</span>
-        </label>
-      </div>
-    </div>
-
-    <div class="card animate-in">
-      <h3>📅 REUNIONES PROGRAMADAS</h3>
-      
-      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:2px solid var(--border)">
-        <div class="day">📖 Martes - 1er Discurso</div>
-        <div class="grid-2 mt-2">
-          <div><label>Hora</label><input type="time" id="r1h"></div>
-          <div><label>Lugar</label><input id="r1l" value="SALÓN DEL REINO"></div>
-        </div>
-        <div class="grid-2 mt-2">
-          <div>
-            <label>Dirección</label>
-            <input id="r1d" placeholder="Dirección completa del salón" oninput="actualizarPreviewMaps('r1d','link_r1d')">
-            <div id="link_r1d"></div>
-          </div>
-          <div><label>Teléfono</label><input id="r1t" placeholder="Contacto del salón"></div>
-        </div>
-      </div>
-      
-      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:2px solid var(--border)">
-        <div class="grid-2">
-          <div class="day">🙋 Miércoles / Sábado</div>
-          <div><label>Día seleccionado</label><select id="r2d"><option>Miércoles</option><option>Sábado</option></select></div>
-        </div>
-        <div class="grid-2 mt-2">
-          <div><label>Hora</label><input type="time" id="r2h"></div>
-          <div><label>Lugar</label><input id="r2l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
-        </div>
-        <div class="grid-2 mt-2">
-          <div>
-            <label>Dirección</label>
-            <input id="r2d_dir" placeholder="Dirección del lugar" oninput="actualizarPreviewMaps('r2d_dir','link_r2d_dir')">
-            <div id="link_r2d_dir"></div>
-          </div>
-          <div><label>Teléfono</label><input id="r2t" placeholder="Contacto"></div>
-        </div>
-      </div>
-      
-      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:2px solid var(--border)">
-        <div class="day">👔 Viernes - Ancianos y SM</div>
-        <div class="grid-2 mt-2">
-          <div><label>Hora</label><input type="time" id="r3h"></div>
-          <div><label>Lugar</label><input id="r3l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
-        </div>
-        <div class="grid-2 mt-2">
-          <div>
-            <label>Dirección</label>
-            <input id="r3d" placeholder="Dirección del lugar" oninput="actualizarPreviewMaps('r3d','link_r3d')">
-            <div id="link_r3d"></div>
-          </div>
-          <div><label>Teléfono</label><input id="r3t" placeholder="Contacto"></div>
-        </div>
-      </div>
-      
-      <div>
-        <div class="grid-2">
-          <div class="day">🎤 Sábado / Domingo</div>
-          <div><label>Día seleccionado</label><select id="r4d"><option>Sábado</option><option>Domingo</option></select></div>
-        </div>
-        <div class="grid-2 mt-2">
-          <div><label>Hora</label><input type="time" id="r4h"></div>
-          <div><label>Lugar</label><input id="r4l" value="SALÓN DEL REINO"></div>
-        </div>
-        <div class="grid-2 mt-2">
-          <div>
-            <label>Dirección</label>
-            <input id="r4d_dir" placeholder="Dirección del salón" oninput="actualizarPreviewMaps('r4d_dir','link_r4d_dir')">
-            <div id="link_r4d_dir"></div>
-          </div>
-          <div><label>Teléfono</label><input id="r4t" placeholder="Contacto del salón"></div>
-        </div>
-      </div>
-      
-      <div class="note mt-4">
-        <strong>⚠️ Importante:</strong> Según tenga la reunión cada congregación — <strong>NO HAGA CAMBIOS sin consultar al SC.</strong>
-      </div>
-    </div>
-
-    <div class="card animate-in">
-      <h3>📢 PREDICACIÓN GENERAL</h3>
-      <div id="pg"></div>
-    </div>
-
-    <div class="card card-green animate-in">
-      <h3>👤 CON EL SC</h3>
-      <div id="sc"></div>
-    </div>
-
-    <div class="card card-purple animate-in">
-      <h3>👩 CON LA ESPOSA DEL SC</h3>
-      <div id="sp"></div>
-    </div>
-
-    <div class="card card-orange animate-in">
-      <h3>🍽️ ALIMENTOS</h3>
-      <div id="al"></div>
-      <div class="note" style="margin-top:14px;margin-bottom:0">
-        💡 <strong>Tip inteligente:</strong> Escriba <em>"En el hospedaje"</em> en el campo de lugar y los campos de dirección se ocultarán automáticamente.
-      </div>
-    </div>
-
-    <div class="card animate-in">
-      <h3>🏠 VISITAS DE PASTOREO</h3>
-      <div id="vis"></div>
-      <button type="button" class="btn btn-outline" onclick="addVis()" style="margin-top:8px">➕ Agregar nueva visita</button>
-    </div>
-
-    <div class="card animate-in">
-      <h3>📋 ASUNTOS PARA LA REUNIÓN CON ANCIANOS</h3>
-      <label>1.</label><textarea id="ag1" rows="2" placeholder="Primer asunto a tratar..."></textarea>
-      <label>2.</label><textarea id="ag2" rows="2" placeholder="Segundo asunto a tratar..."></textarea>
-      <label>3.</label><textarea id="ag3" rows="2" placeholder="Tercer asunto a tratar..."></textarea>
-    </div>
-
-  </form>
-
-  <div style="display:grid;gap:12px;margin:24px 0">
-    <button class="btn" onclick="gen()">
-      <span>📄</span> GENERAR PDF Y ENVIAR POR WHATSAPP
-    </button>
-    
-    <button class="btn btn-secondary" onclick="enviarResumenUbicaciones()">
-      <span>📱</span> ENVIAR RESUMEN DE UBICACIONES AL SC
-    </button>
-    
-    <div class="grid-2">
-      <button class="btn btn-outline" onclick="soloPDF()">
-        <span>💾</span> Solo Descargar PDF
-      </button>
-      <button class="btn btn-outline" onclick="soloWhatsApp()">
-        <span>💬</span> Solo Enviar WhatsApp
-      </button>
-    </div>
-  </div>
-
-  <div class="mm animate-in">
-    <strong>📁 MULTIMEDIA JW Hub (CHI-03)</strong>
-    <em>Gilberto Flores Fabián • Actualización 7 de abril de 2026</em><br><br>
-    <strong>DISCURSO DEL MARTES:</strong> 3 videos en JW Hub → Documentos → Archivos multimedia<br>
-    • Vídeo 1-3: ¿Qué estás dispuesto a hacer "por las buenas noticias"? (3-4 min c/u)<br><br>
-    <strong>PR Y PA:</strong> Sin multimedia<br><br>
-    <strong>ANCIANOS Y SM:</strong> Repasar lecciones 10 y 27 de "Benefíciese"<br>
-    • 3 videos: "Los pastores hábiles capacitan..." (4-5 min c/u)<br><br>
-    <strong>DISCURSO PÚBLICO:</strong> 3 imágenes en JW Hub<br>
-    <strong>2DO DISCURSO SERVICIO:</strong> Sin multimedia<br><br>
-    <strong>P.D. CCA:</strong> Descargar archivos con anticipación
-  </div>
-
-  <div class="note animate-in">
-    <strong>📌 NOTA IMPORTANTE:</strong> Esta página no se debe pegar en el tablero de información.<br>
-    • Revisen que no se crucen horarios • Alimentos desde miércoles<br>
-    ✓ Domingo: análisis de informe con Comité de Servicio
+  <div class="stats-right">
+    <div class="stat-pill" id="fieldsCount">0 / 0 campos</div>
+    <div class="stat-pill" id="conflictPill" style="display:none"></div>
   </div>
 </div>
 
-<button class="help-button" onclick="abrirAyuda()" title="¿Necesita ayuda?" style="position:fixed;bottom:28px;right:28px;width:64px;height:64px;background:linear-gradient(135deg,#ff6b35,#ff5722);color:#fff;border-radius:50%;border:none;font-size:1.8rem;cursor:pointer;box-shadow:0 6px 20px rgba(255,107,53,0.4);z-index:1000;transition:all 0.3s;display:flex;align-items:center;justify-content:center;">
-  ❓
-</button>
+<!-- CONFLICT ALERT -->
+<div class="conflict-alert" id="conflictAlert">
+  <h4>⚠️ Conflictos de Horario Detectados</h4>
+  <div id="conflictList"></div>
+</div>
 
-<div class="modal-overlay" id="helpOverlay" onclick="cerrarAyuda()"></div>
-<div class="modal" id="helpModal" style="max-width:800px">
-  <div class="modal-header" style="background:linear-gradient(135deg,#ff6b35,#ff5722)">
-    <h2>❓ Centro de Ayuda</h2>
-    <button class="modal-close" onclick="cerrarAyuda()">×</button>
+<!-- TOOLS ROW -->
+<div class="tools-row">
+  <button class="btn btn-sm btn-ghost" onclick="exportData()">📤 Exportar</button>
+  <button class="btn btn-sm btn-ghost" onclick="document.getElementById('impF').click()">📥 Importar</button>
+  <input type="file" id="impF" class="hidden" accept=".json" onchange="importData(this)">
+  <button class="btn btn-sm btn-ghost" onclick="clearAll()">🧹 Limpiar</button>
+  <button class="btn btn-sm btn-ghost" onclick="expandAll()">⬇️ Expandir todo</button>
+  <button class="btn btn-sm btn-ghost" onclick="collapseAll()">⬆️ Colapsar todo</button>
+</div>
+
+<!-- ADMIN SECTION -->
+<div class="admin-wrap" id="adminWrap">
+  <h3 style="font-family:var(--font-h);color:#c47d10;display:flex;align-items:center;gap:8px;margin-bottom:14px">🔐 Temas de Discursos <span style="background:var(--war);color:#fff;padding:3px 10px;border-radius:20px;font-size:.7rem">ADMIN</span></h3>
+  <p style="color:var(--txt2);font-size:.85rem;margin-bottom:16px">Estos temas aparecerán en el PDF generado.</p>
+  <div class="tema-box"><label>Martes - 1er Discurso</label><textarea id="t_mar">¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?</textarea><small>🎵 Canción 76</small></div>
+  <div class="tema-box"><label>Miércoles/Sábado - Precursores</label><textarea id="t_mie">SIGA ADELANTE HACIA LA META (Fil. 3:14)</textarea></div>
+  <div class="tema-box"><label>Viernes - Ancianos / SM</label><textarea id="t_vie">SIGAN PROGRESANDO "COMO REGALOS" DE DIOS (Ef 4:8)</textarea></div>
+  <div class="tema-box"><label>Sábado/Domingo - Discurso Público</label><textarea id="t_sab">CÓMO COSECHAR VIDA ETERNA</textarea><small>🎵 Canción 145</small></div>
+  <div class="tema-box"><label>2do Discurso - Servicio</label><textarea id="t_2do">"JEHOVÁ NO RETENDRÁ NADA BUENO…"</textarea><small>🎵 Canción 155</small></div>
+  <div class="g2 mt-4">
+    <button class="btn btn-orange" onclick="toast('✅ Temas guardados','ok')">💾 Guardar Temas</button>
+    <button class="btn" style="background:#6b7280" onclick="restoreTopics()">↩️ Restaurar</button>
   </div>
-  <div class="modal-body">
-    <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;justify-content:center">
-      <button class="btn btn-sm" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('inicio', this)">🏠 Inicio</button>
-      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('primeravez', this)">🆕 Primera vez</button>
-      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('pasoapaso', this)">📝 Paso a paso</button>
-      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('problemas', this)">🔧 Problemas</button>
-      <button class="btn btn-sm btn-outline" style="flex:1;min-width:120px" onclick="mostrarSeccionAyuda('faq', this)">❓ FAQ</button>
+</div>
+
+<form id="mainForm">
+
+<!-- 1. HOSPEDAJE -->
+<div class="card acc-green" id="sec-hosp">
+  <div class="card-header" onclick="toggleCard('hosp')">
+    <div class="card-title"><span class="card-title-icon">📍</span> Ubicación del SC</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-hosp"></div></div><span id="badge-hosp" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
     </div>
-    
-    <div id="ayuda-inicio">
-      <h3 style="color:var(--primary);margin-bottom:16px">👋 Bienvenido a la versión 2.0</h3>
-      <p style="line-height:1.8;margin-bottom:16px">Esta herramienta organiza la visita del SC a su congregación. Ahora con <strong>guardado automático</strong>, <strong>modo oscuro</strong>, <strong>exportación de datos</strong> y mucho más.</p>
-      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;border-radius:0 10px 10px 0;margin:14px 0">
-        💡 <strong>¿Nuevo aquí?</strong> Toque <strong>"Primera vez"</strong> arriba para la guía completa.
+  </div>
+  <div class="card-body" id="body-hosp">
+    <div class="hosp-box">
+      <div class="g2">
+        <div>
+          <label>Dirección del Hospedaje *</label>
+          <input id="sc_dir" required placeholder="Calle, número, colonia, ciudad" oninput="onMaps('sc_dir','prev_sc')">
+          <div id="prev_sc"></div>
+        </div>
+        <div>
+          <label>Teléfono de Contacto *</label>
+          <input id="sc_tel" required placeholder="656 123 4567" oninput="fmtPhone(this)">
+        </div>
       </div>
-    </div>
-    
-    <div id="ayuda-primeravez" style="display:none">
-      <h3 style="color:var(--primary);margin-bottom:16px">🆕 Guía para Usuarios Nuevos</h3>
-      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
-        <strong>PASO 1:</strong> Complete <strong>"📍 Ubicación del SC"</strong> con dirección y teléfono.
-      </div>
-      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
-        <strong>PASO 2:</strong> En <strong>"⚙️ Configuración"</strong> escriba congregación y fechas.
-      </div>
-      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
-        <strong>PASO 3:</strong> Llene <strong>"📅 REUNIONES"</strong> con horarios y lugares.
-      </div>
-      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
-        <strong>PASO 4:</strong> Complete <strong>"🍽️ ALIMENTOS"</strong>. Escriba "En el hospedaje" para ocultar dirección.
-      </div>
-      <div style="background:var(--primary-light);border-left:5px solid var(--primary);padding:16px;margin:12px 0;border-radius:0 10px 10px 0">
-        <strong>PASO 5:</strong> Toque <strong>"📄 GENERAR PDF"</strong>. ¡Listo!
-      </div>
-    </div>
-    
-    <div id="ayuda-pasoapaso" style="display:none">
-      <h3 style="color:var(--primary);margin-bottom:16px">📝 Consejos Profesionales</h3>
-      <ul style="margin-left:24px;line-height:2">
-        <li>✅ Use direcciones completas: "Calle Juárez 123, Centro, Ciudad Juárez"</li>
-        <li>✅ El guardado automático funciona cada 3 segundos</li>
-        <li>✅ Exporte sus datos como respaldo antes de cerrar</li>
-        <li>✅ Use el modo oscuro para trabajar de noche</li>
-        <li>✅ Revise el checklist antes de generar el PDF</li>
-      </ul>
-    </div>
-    
-    <div id="ayuda-problemas" style="display:none">
-      <h3 style="color:var(--primary);margin-bottom:16px">🔧 Solución de Problemas</h3>
-      <p style="margin-bottom:10px"><strong>❌ "No se pudo generar el PDF"</strong></p>
-      <p style="margin-bottom:16px;color:var(--text-secondary)">Espere 10-20 segundos tras abrir la página. Recargue si persiste (F5).</p>
-      <p style="margin-bottom:10px"><strong>❌ "Se perdieron mis datos"</strong></p>
-      <p style="margin-bottom:16px;color:var(--text-secondary)">Use el botón <strong>"📤 Exportar Datos"</strong> para respaldar. Los datos se guardan automáticamente en este navegador.</p>
-      <p style="margin-bottom:10px"><strong>❌ "La página se ve rara"</strong></p>
-      <p style="color:var(--text-secondary)">Pruebe cambiar el tema con el botón 🌓 arriba a la derecha.</p>
-    </div>
-    
-    <div id="ayuda-faq" style="display:none">
-      <h3 style="color:var(--primary);margin-bottom:16px">❓ Preguntas Frecuentes</h3>
-      <p style="margin-bottom:10px"><strong>🤔 ¿Se guarda automáticamente?</strong></p>
-      <p style="margin-bottom:16px;color:var(--text-secondary)">Sí. Cada 3 segundos se guarda en el navegador. Pero use <strong>Exportar</strong> para respaldo completo.</p>
-      <p style="margin-bottom:10px"><strong>🤔 ¿Funciona sin internet?</strong></p>
-      <p style="margin-bottom:16px;color:var(--text-secondary)">Sí, una vez cargada la página. Pero necesita internet para enviar WhatsApp y ver mapas.</p>
-      <p style="margin-bottom:10px"><strong>🤔 ¿Puedo usarlo en iPhone/Android?</strong></p>
-      <p style="color:var(--text-secondary)">Sí. Está optimizado para móviles. Puede agregarlo a la pantalla de inicio.</p>
+      <button type="button" class="btn-maps" style="width:100%;justify-content:center" onclick="openMaps('sc_dir')">🗺️ Ver en Google Maps</button>
     </div>
   </div>
 </div>
 
-<div class="modal-overlay" id="passwordOverlay" onclick="cerrarLoginAdmin()"></div>
-<div class="modal password-modal" id="passwordModal">
+<!-- 2. CONFIGURACIÓN -->
+<div class="card acc-blue" id="sec-cfg">
+  <div class="card-header" onclick="toggleCard('cfg')">
+    <div class="card-title"><span class="card-title-icon">⚙️</span> Configuración General</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-cfg"></div></div><span id="badge-cfg" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-cfg">
+    <div class="g2">
+      <div><label>Congregación *</label><input id="cong" required placeholder="Ej. Juárez Centro"></div>
+      <div><label>Fechas de Visita *</label><input id="fec" required placeholder="Ej. 15/03 al 20/03/2026"></div>
+    </div>
+    <label class="mt-2">📱 WhatsApp del SC (con código país, sin +)</label>
+    <input id="wa" value="526121418717" placeholder="526121418717">
+    <span class="hint">💡 México: 52 + 10 dígitos</span>
+  </div>
+</div>
+
+<!-- 3. TIMELINE / CHECKLIST -->
+<div class="card" id="sec-check">
+  <div class="card-header" onclick="toggleCard('check')">
+    <div class="card-title"><span class="card-title-icon">✅</span> Línea de Tiempo & Checklist</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-check"></div></div><span id="badge-check" class="sec-badge empty">0/6</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-check">
+    <div class="timeline" id="tl">
+      <div class="tl-item" onclick="tlClick(this,0)"><div class="tl-dot">🛬</div><div class="tl-label">Llegada</div></div>
+      <div class="tl-item" onclick="tlClick(this,1)"><div class="tl-dot">📖</div><div class="tl-label">Martes</div></div>
+      <div class="tl-item" onclick="tlClick(this,2)"><div class="tl-dot">🙋</div><div class="tl-label">Miérc.</div></div>
+      <div class="tl-item" onclick="tlClick(this,3)"><div class="tl-dot">📢</div><div class="tl-label">Jueves</div></div>
+      <div class="tl-item" onclick="tlClick(this,4)"><div class="tl-dot">👔</div><div class="tl-label">Viernes</div></div>
+      <div class="tl-item" onclick="tlClick(this,5)"><div class="tl-dot">🎤</div><div class="tl-label">Sábado</div></div>
+      <div class="tl-item" onclick="tlClick(this,6)"><div class="tl-dot">✈️</div><div class="tl-label">Salida</div></div>
+    </div>
+    <div style="margin-top:16px" id="chklist">
+      <label class="chk-item" onclick="chkToggle(this)"><input type="checkbox"><span>Confirmar hospedaje del SC</span></label>
+      <label class="chk-item" onclick="chkToggle(this)"><input type="checkbox"><span>Verificar horarios del Salón del Reino</span></label>
+      <label class="chk-item" onclick="chkToggle(this)"><input type="checkbox"><span>Coordinar alimentos desde el miércoles</span></label>
+      <label class="chk-item" onclick="chkToggle(this)"><input type="checkbox"><span>Preparar multimedia en JW Hub</span></label>
+      <label class="chk-item" onclick="chkToggle(this)"><input type="checkbox"><span>Confirmar hermanos para predicar con el SC</span></label>
+      <label class="chk-item" onclick="chkToggle(this)"><input type="checkbox"><span>Revisar que no haya cruces de horarios</span></label>
+    </div>
+  </div>
+</div>
+
+<!-- 4. REUNIONES -->
+<div class="card acc-blue" id="sec-reun">
+  <div class="card-header" onclick="toggleCard('reun')">
+    <div class="card-title"><span class="card-title-icon">📅</span> Reuniones Programadas</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-reun"></div></div><span id="badge-reun" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-reun">
+
+    <div class="reunion-block">
+      <div class="reunion-day-label">📖 Martes — 1er Discurso</div>
+      <div class="g2">
+        <div><label>Hora</label><input type="time" id="r1h" oninput="detectConflicts()"></div>
+        <div><label>Lugar</label><input id="r1l" value="SALÓN DEL REINO"></div>
+      </div>
+      <div class="g2">
+        <div><label>Dirección</label><input id="r1d" placeholder="Dirección completa" oninput="onMaps('r1d','lr1d')"></div>
+        <div><label>Teléfono</label><input id="r1t" placeholder="Contacto" oninput="fmtPhone(this)"></div>
+      </div>
+      <div id="lr1d"></div>
+    </div>
+
+    <div class="reunion-block">
+      <div class="g2" style="margin-bottom:12px">
+        <div class="reunion-day-label" style="margin-bottom:0">🙋 Miércoles / Sábado — Precursores</div>
+        <div><label>Día</label><select id="r2d"><option>Miércoles</option><option>Sábado</option></select></div>
+      </div>
+      <div class="g2">
+        <div><label>Hora</label><input type="time" id="r2h" oninput="detectConflicts()"></div>
+        <div><label>Lugar</label><input id="r2l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
+      </div>
+      <div class="g2">
+        <div><label>Dirección</label><input id="r2d_dir" placeholder="Dirección del lugar" oninput="onMaps('r2d_dir','lr2d')"></div>
+        <div><label>Teléfono</label><input id="r2t" placeholder="Contacto" oninput="fmtPhone(this)"></div>
+      </div>
+      <div id="lr2d"></div>
+    </div>
+
+    <div class="reunion-block">
+      <div class="reunion-day-label">👔 Viernes — Ancianos y Siervos de Ministerio</div>
+      <div class="g2">
+        <div><label>Hora</label><input type="time" id="r3h" oninput="detectConflicts()"></div>
+        <div><label>Lugar</label><input id="r3l" value="EN DÓNDE DECIDA EL CUERPO DE ANCIANOS"></div>
+      </div>
+      <div class="g2">
+        <div><label>Dirección</label><input id="r3d" placeholder="Dirección del lugar" oninput="onMaps('r3d','lr3d')"></div>
+        <div><label>Teléfono</label><input id="r3t" placeholder="Contacto" oninput="fmtPhone(this)"></div>
+      </div>
+      <div id="lr3d"></div>
+    </div>
+
+    <div class="reunion-block">
+      <div class="g2" style="margin-bottom:12px">
+        <div class="reunion-day-label" style="margin-bottom:0">🎤 Sábado / Domingo — Discurso Público</div>
+        <div><label>Día</label><select id="r4d"><option>Sábado</option><option>Domingo</option></select></div>
+      </div>
+      <div class="g2">
+        <div><label>Hora</label><input type="time" id="r4h" oninput="detectConflicts()"></div>
+        <div><label>Lugar</label><input id="r4l" value="SALÓN DEL REINO"></div>
+      </div>
+      <div class="g2">
+        <div><label>Dirección</label><input id="r4d_dir" placeholder="Dirección del salón" oninput="onMaps('r4d_dir','lr4d')"></div>
+        <div><label>Teléfono</label><input id="r4t" placeholder="Contacto" oninput="fmtPhone(this)"></div>
+      </div>
+      <div id="lr4d"></div>
+    </div>
+
+    <div class="note">⚠️ <strong>Importante:</strong> Según tenga la reunión cada congregación. <strong>NO HAGA CAMBIOS sin consultar al SC.</strong></div>
+  </div>
+</div>
+
+<!-- 5. PREDICACIÓN -->
+<div class="card acc-blue" id="sec-pred">
+  <div class="card-header" onclick="toggleCard('pred')">
+    <div class="card-title"><span class="card-title-icon">📢</span> Predicación General</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-pred"></div></div><span id="badge-pred" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-pred">
+    <div id="pgGrid"></div>
+  </div>
+</div>
+
+<!-- 6. CON SC -->
+<div class="card acc-green" id="sec-csc">
+  <div class="card-header" onclick="toggleCard('csc')">
+    <div class="card-title"><span class="card-title-icon">👤</span> Con el SC</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-csc"></div></div><span id="badge-csc" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-csc">
+    <div id="scGrid"></div>
+  </div>
+</div>
+
+<!-- 7. CON ESPOSA -->
+<div class="card acc-purple" id="sec-esp">
+  <div class="card-header" onclick="toggleCard('esp')">
+    <div class="card-title"><span class="card-title-icon">👩</span> Con la Esposa del SC</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-esp"></div></div><span id="badge-esp" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-esp">
+    <div id="spGrid"></div>
+  </div>
+</div>
+
+<!-- 8. ALIMENTOS -->
+<div class="card acc-orange" id="sec-al">
+  <div class="card-header" onclick="toggleCard('al')">
+    <div class="card-title"><span class="card-title-icon">🍽️</span> Alimentos</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-al"></div></div><span id="badge-al" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-al">
+    <div id="alGrid"></div>
+    <div class="note">💡 Escriba <em>"En el hospedaje"</em> para ocultar automáticamente los campos de dirección.</div>
+  </div>
+</div>
+
+<!-- 9. VISITAS -->
+<div class="card acc-blue" id="sec-vis">
+  <div class="card-header" onclick="toggleCard('vis')">
+    <div class="card-title"><span class="card-title-icon">🏠</span> Visitas de Pastoreo</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-vis"></div></div><span id="badge-vis" class="sec-badge empty">0 visitas</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-vis">
+    <div id="visGrid"></div>
+    <button type="button" class="btn btn-ghost" onclick="addVis()" style="margin-top:4px">➕ Agregar visita</button>
+  </div>
+</div>
+
+<!-- 10. AGENDA -->
+<div class="card" id="sec-ag">
+  <div class="card-header" onclick="toggleCard('ag')">
+    <div class="card-title"><span class="card-title-icon">📋</span> Agenda Reunión Ancianos</div>
+    <div class="card-meta">
+      <div class="card-prog"><div class="mini-bar"><div class="mini-bar-fill" id="mbar-ag"></div></div><span id="badge-ag" class="sec-badge empty">vacío</span></div>
+      <div class="card-toggle">▼</div>
+    </div>
+  </div>
+  <div class="card-body" id="body-ag">
+    <label>1.</label><textarea id="ag1" placeholder="Primer asunto a tratar…"></textarea>
+    <label>2.</label><textarea id="ag2" placeholder="Segundo asunto a tratar…"></textarea>
+    <label>3.</label><textarea id="ag3" placeholder="Tercer asunto a tratar…"></textarea>
+  </div>
+</div>
+
+</form>
+
+<!-- ACTION BUTTONS -->
+<div style="display:grid;gap:10px;margin:20px 0">
+  <button class="btn btn-blue" onclick="genPDF()">📄 Generar PDF + Enviar por WhatsApp</button>
+  <button class="btn btn-orange" onclick="sendLocationsSummary()">📱 Enviar Resumen de Ubicaciones al SC</button>
+  <div class="g2">
+    <button class="btn btn-ghost" onclick="onlyPDF()">💾 Solo PDF</button>
+    <button class="btn btn-ghost" onclick="onlyWA()">💬 Solo WhatsApp</button>
+  </div>
+</div>
+
+<!-- MULTIMEDIA NOTE -->
+<div class="mm-box" style="margin-bottom:14px">
+  <strong style="display:block;font-family:var(--font-h);margin-bottom:8px">📁 MULTIMEDIA JW Hub (CHI-03)</strong>
+  <em>Gilberto Flores Fabián · Actualización 7 de abril de 2026</em><br><br>
+  <strong>DISC. MARTES:</strong> 3 videos en JW Hub → Documentos → Archivos multimedia<br>
+  • Vídeo 1-3: ¿Qué estás dispuesto a hacer "por las buenas noticias"? (3-4 min c/u)<br><br>
+  <strong>PR Y PA:</strong> Sin multimedia<br><br>
+  <strong>ANCIANOS Y SM:</strong> Repasar lecciones 10 y 27 de "Benefíciese"<br>
+  • 3 videos: "Los pastores hábiles capacitan…" (4-5 min c/u)<br><br>
+  <strong>DISC. PÚBLICO:</strong> 3 imágenes en JW Hub<br>
+  <strong>2DO DISC. SERVICIO:</strong> Sin multimedia<br><br>
+  <strong>P.D. CCA:</strong> Descargar archivos con anticipación
+</div>
+
+<div class="note">
+  📌 <strong>NOTA:</strong> Esta página no se debe pegar en el tablero de información.<br>
+  • Revisen que no se crucen horarios • Alimentos desde el miércoles<br>
+  ✓ Domingo: análisis de informe con Comité de Servicio
+</div>
+
+</div><!-- /.wrap -->
+
+<!-- QUICK NAV -->
+<nav class="qnav">
+  <button class="qnav-btn" onclick="scrollTo('sec-hosp')" title="Hospedaje">📍<span class="lbl">Hosp.</span></button>
+  <button class="qnav-btn" onclick="scrollTo('sec-cfg')" title="Configuración">⚙️<span class="lbl">Config</span></button>
+  <button class="qnav-btn" onclick="scrollTo('sec-reun')" title="Reuniones">📅<span class="lbl">Reun.</span></button>
+  <div class="qnav-divider"></div>
+  <button class="qnav-btn" onclick="scrollTo('sec-pred')" title="Predicación">📢<span class="lbl">Pred.</span></button>
+  <button class="qnav-btn" onclick="scrollTo('sec-al')" title="Alimentos">🍽️<span class="lbl">Alim.</span></button>
+  <button class="qnav-btn" onclick="scrollTo('sec-vis')" title="Visitas">🏠<span class="lbl">Vis.</span></button>
+  <div class="qnav-divider"></div>
+  <button class="qnav-btn" onclick="genPDF()" title="Generar PDF">📄<span class="lbl">PDF</span></button>
+</nav>
+
+<!-- MODALS -->
+<div class="m-overlay" id="pwOverlay" onclick="closePW()"></div>
+<div class="modal pw-modal" id="pwModal" style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);padding:28px;max-width:380px;width:92%">
   <h3>🔐 Acceso de Administrador</h3>
-  <p style="color:var(--text-secondary);margin-bottom:16px;font-size:0.95rem">Ingrese la contraseña para editar los temas de los discursos</p>
-  <input type="password" id="passwordInput" placeholder="••••••••" maxlength="20" onkeypress="if(event.key==='Enter')verificarPassword()">
-  <button class="btn btn-secondary" style="margin-top:8px" onclick="verificarPassword()">🔓 Desbloquear</button>
-  <div id="passwordError" style="color:var(--danger);margin-top:12px;display:none;font-weight:600">❌ Contraseña incorrecta</div>
-  <div class="hint">💡 Pista: admin123</div>
+  <p style="color:var(--txt2);margin-bottom:14px;font-size:.88rem">Contraseña para editar temas de discursos</p>
+  <input type="password" class="pw-input" id="pwInp" placeholder="••••••••" maxlength="20" onkeypress="if(event.key==='Enter')verifyPW()">
+  <button class="btn btn-orange" style="margin-top:10px" onclick="verifyPW()">🔓 Desbloquear</button>
+  <div class="pw-err" id="pwErr">❌ Contraseña incorrecta</div>
+  <div class="pw-hint">💡 Pista: admin123</div>
+</div>
+
+<div class="m-overlay" id="prevOverlay" onclick="closePrev()"></div>
+<div class="modal" id="prevModal">
+  <div class="m-head">
+    <h2>👁️ Vista Previa del Programa</h2>
+    <button class="m-x" onclick="closePrev()">×</button>
+  </div>
+  <div class="m-body" id="prevBody"></div>
 </div>
 
 <script>
-const dias = ['Miércoles','Jueves','Viernes','Sábado','Domingo'];
-const pref = ['mie','jue','vie','sab','dom'];
-
-const temasDefault = {
-  martes: '¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?',
-  miercoles: 'SIGA ADELANTE HACIA LA META (Fil. 3:14)',
-  viernes: 'SIGAN PROGRESANDO "COMO REGALOS" DE DIOS (Ef 4:8)',
-  sabado: 'CÓMO COSECHAR VIDA ETERNA',
-  segundo: '"JEHOVÁ NO RETENDRÁ NADA BUENO..."'
+// ───────────────────────────────────────────
+// CONSTANTS
+// ───────────────────────────────────────────
+const DIAS = ['Miércoles','Jueves','Viernes','Sábado','Domingo'];
+const TEMAS_DEF = {
+  mar:'¿QUÉ ESTÁS DISPUESTO A HACER "POR LAS BUENAS NOTICIAS"?',
+  mie:'SIGA ADELANTE HACIA LA META (Fil. 3:14)',
+  vie:'SIGAN PROGRESANDO "COMO REGALOS" DE DIOS (Ef 4:8)',
+  sab:'CÓMO COSECHAR VIDA ETERNA',
+  d2o:'"JEHOVÁ NO RETENDRÁ NADA BUENO…"'
 };
-
 let vc = 0;
-let autoSaveInterval;
 
+// ───────────────────────────────────────────
+// INIT
+// ───────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  generarSeccionesDinamicas();
-  inicializarEventos();
-  cargarDatosLocalStorage();
-  iniciarAutoSave();
-  verificarTemaGuardado();
-  
-  setTimeout(() => {
-    if (typeof window.jspdf === 'undefined') {
-      showToast('⚠️ Cargando librerías PDF... espere un momento', 'warning');
-    } else {
-      showToast('✅ Herramienta lista. Los datos se guardan automáticamente.', 'success');
-    }
-  }, 1500);
+  buildDynamicSections();
+  loadData();
+  setInterval(saveData, 3000);
+  window.addEventListener('beforeunload', saveData);
+  loadTheme();
+  checkURLData();
+  setTimeout(() => toast('✅ Listo. Datos guardados automáticamente.','ok'), 1500);
 });
 
-function generarSeccionesDinamicas() {
-  pref.forEach((p, i) => {
-    document.getElementById('pg').innerHTML += `
-      <div class="grid-5">
-        <div class="day">${dias[i]}</div>
-        <div><label>Mañana</label><input type="time" id="pg_m${i}" ${i===0||i===2?'value="09:15"':''}></div>
-        <div><label>Tarde</label><input type="time" id="pg_t${i}" ${i===0||i===2?'value="17:00"':''}></div>
-        <div><label>Lugar</label><input id="pg_l${i}" placeholder="Punto de reunión"></div>
-        <div><label>Territorio</label><input id="pg_ter${i}" placeholder="Terr. asignado"></div>
-      </div>`;
-    
-    document.getElementById('sc').innerHTML += `
-      <div class="grid-5">
-        <div class="day">${dias[i]}</div>
-        <div><label>Mañana</label><input type="time" id="sc_m${i}"></div>
-        <div><label>Hermano</label><input id="sc_n1${i}" placeholder="Nombre"></div>
-        <div><label>Tarde</label><input type="time" id="sc_t${i}"></div>
-        <div><label>Hermano</label><input id="sc_n2${i}" placeholder="Nombre"></div>
-      </div>`;
-    
-    document.getElementById('sp').innerHTML += `
-      <div class="grid-5">
-        <div class="day">${dias[i]}</div>
-        <div><label>Mañana</label><input type="time" id="sp_m${i}"></div>
-        <div><label>Hermana</label><input id="sp_n1${i}" placeholder="Nombre"></div>
-        <div><label>Tarde</label><input type="time" id="sp_t${i}"></div>
-        <div><label>Hermana</label><input id="sp_n2${i}" placeholder="Nombre"></div>
-      </div>`;
-    
-    const cenDef = (i===1||i===3||i===4) ? 'En el hospedaje' : '';
-    document.getElementById('al').innerHTML += `
-      <div style="margin-bottom:20px;padding:18px;background:var(--surface-2);border-radius:14px;border-left:4px solid var(--warning)">
-        <div class="day" style="margin-bottom:14px;font-size:1.05rem">${dias[i]}</div>
-        
-        <div style="background:var(--surface);padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
-          <label style="color:var(--warning);font-size:0.95rem">🌅 DESAYUNO</label>
-          <input id="al_d${i}" value="En el hospedaje" style="margin-bottom:6px" oninput="toggleDireccionHospedaje('d',${i})">
-          <div id="div_al_d_dir${i}" class="direccion-hospedaje" style="display:none">
-            <input id="al_d_dir${i}" placeholder="📍 Dirección (si aplica)">
-            <input id="al_d_tel${i}" placeholder="📞 Teléfono (si aplica)" style="margin-top:8px">
-          </div>
-          <div id="link_al_d_dir${i}"></div>
-        </div>
-        
-        <div style="background:var(--surface);padding:16px;border-radius:12px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
-          <label style="color:#e65100;font-size:0.95rem">🍖 COMIDA</label>
-          <input id="al_c${i}" placeholder="Lugar de la comida" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('c',${i})">
-          <div id="div_al_c_dir${i}" class="direccion-hospedaje">
-            <input id="al_c_dir${i}" placeholder="📍 Dirección completa">
-            <input id="al_c_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
-          </div>
-          <div id="link_al_c_dir${i}"></div>
-        </div>
-        
-        <div style="background:var(--surface);padding:16px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
-          <label style="color:#5d4037;font-size:0.95rem">🌙 CENA</label>
-          <input id="al_n${i}" value="${cenDef}" placeholder="Lugar de la cena" style="margin-bottom:10px" oninput="toggleDireccionHospedaje('n',${i})">
-          <div id="div_al_n_dir${i}" class="direccion-hospedaje ${cenDef ? '' : 'visible'}" style="${cenDef ? 'display:none' : ''}">
-            <input id="al_n_dir${i}" placeholder="📍 Dirección completa">
-            <input id="al_n_tel${i}" placeholder="📞 Teléfono de contacto" style="margin-top:8px">
-          </div>
-          <div id="link_al_n_dir${i}"></div>
-        </div>
-      </div>`;
-    
-    setTimeout(() => {
-      toggleDireccionHospedaje('d', i);
-      if (cenDef) toggleDireccionHospedaje('n', i);
-      generarLinkMaps(`al_c_dir${i}`, `link_al_c_dir${i}`);
-      generarLinkMaps(`al_n_dir${i}`, `link_al_n_dir${i}`);
-    }, 100);
+// ───────────────────────────────────────────
+// BUILD DYNAMIC GRIDS
+// ───────────────────────────────────────────
+function buildDynamicSections(){
+  const pg = document.getElementById('pgGrid');
+  const sc = document.getElementById('scGrid');
+  const sp = document.getElementById('spGrid');
+  const al = document.getElementById('alGrid');
+
+  DIAS.forEach((d, i) => {
+    // Predicación
+    pg.innerHTML += `
+    <div class="g5">
+      <div class="day-label">${d}</div>
+      <div><label>Mañana</label><input type="time" id="pg_m${i}" ${i===0||i===2?'value="09:15"':''}></div>
+      <div><label>Tarde</label><input type="time" id="pg_t${i}" ${i===0||i===2?'value="17:00"':''}></div>
+      <div><label>Lugar</label><input id="pg_l${i}" placeholder="Punto de reunión"></div>
+      <div><label>Territorio</label><input id="pg_ter${i}" placeholder="Terr. asignado"></div>
+    </div>`;
+    // SC
+    sc.innerHTML += `
+    <div class="g5">
+      <div class="day-label">${d}</div>
+      <div><label>Mañana</label><input type="time" id="sc_m${i}"></div>
+      <div><label>Hermano</label><input id="sc_n1${i}" placeholder="Nombre"></div>
+      <div><label>Tarde</label><input type="time" id="sc_t${i}"></div>
+      <div><label>Hermano</label><input id="sc_n2${i}" placeholder="Nombre"></div>
+    </div>`;
+    // Esposa
+    sp.innerHTML += `
+    <div class="g5">
+      <div class="day-label">${d}</div>
+      <div><label>Mañana</label><input type="time" id="sp_m${i}"></div>
+      <div><label>Hermana</label><input id="sp_n1${i}" placeholder="Nombre"></div>
+      <div><label>Tarde</label><input type="time" id="sp_t${i}"></div>
+      <div><label>Hermana</label><input id="sp_n2${i}" placeholder="Nombre"></div>
+    </div>`;
+    // Alimentos
+    const cenaDef = (i===1||i===3||i===4) ? 'En el hospedaje' : '';
+    al.innerHTML += `
+    <div class="meal-day">
+      <div style="font-weight:800;font-size:.88rem;text-transform:uppercase;letter-spacing:.5px;color:var(--war);margin-bottom:12px">${d}</div>
+      <div class="meal-block">
+        <div class="meal-label">🌅 Desayuno</div>
+        <input id="al_d${i}" value="En el hospedaje" oninput="toggleHosp('d',${i})">
+        <div id="div_al_d${i}" class="dir-hide"><input id="al_dd${i}" placeholder="📍 Dirección"><input id="al_dt${i}" placeholder="📞 Teléfono" style="margin-top:6px"></div>
+        <div id="lk_al_d${i}"></div>
+      </div>
+      <div class="meal-block">
+        <div class="meal-label" style="color:#c47d10">🍖 Comida</div>
+        <input id="al_c${i}" placeholder="Lugar de la comida" oninput="toggleHosp('c',${i})">
+        <div id="div_al_c${i}" class="dir-hide show"><input id="al_cd${i}" placeholder="📍 Dirección"><input id="al_ct${i}" placeholder="📞 Teléfono" style="margin-top:6px"></div>
+        <div id="lk_al_c${i}"></div>
+      </div>
+      <div class="meal-block">
+        <div class="meal-label" style="color:#5d4037">🌙 Cena</div>
+        <input id="al_n${i}" value="${cenaDef}" placeholder="Lugar de la cena" oninput="toggleHosp('n',${i})">
+        <div id="div_al_n${i}" class="dir-hide ${cenaDef?'':'show'}"><input id="al_nd${i}" placeholder="📍 Dirección"><input id="al_nt${i}" placeholder="📞 Teléfono" style="margin-top:6px"></div>
+        <div id="lk_al_n${i}"></div>
+      </div>
+    </div>`;
   });
-  
-  addVis(); addVis(); addVis();
-  
+
   setTimeout(() => {
-    ['r1d','r2d_dir','r3d','r4d_dir'].forEach(id => {
-      generarLinkMaps(id, 'link_'+id);
-      const el = document.getElementById(id);
-      if (el) el.addEventListener('input', actualizarProgreso);
+    DIAS.forEach((_,i) => {
+      toggleHosp('d',i);
+      toggleHosp('c',i);
+      toggleHosp('n',i);
     });
-    actualizarProgreso();
-  }, 200);
+    // Add default visits
+    addVis(); addVis(); addVis();
+    updateProgress();
+  }, 100);
+
+  document.addEventListener('input', updateProgress);
 }
 
-function inicializarEventos() {
-  document.querySelectorAll('input[required]').forEach(input => {
-    input.addEventListener('blur', () => validarCampo(input));
-    input.addEventListener('input', () => {
-      if (input.classList.contains('invalid')) validarCampo(input);
-    });
-  });
-  
-  document.querySelectorAll('.timeline-item').forEach(item => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.timeline-item').forEach(t => t.classList.remove('active'));
-      item.classList.add('active');
-    });
-  });
+// ───────────────────────────────────────────
+// CARD TOGGLE
+// ───────────────────────────────────────────
+function toggleCard(id, force){
+  const hdr = document.querySelector(`#sec-${id} .card-header`);
+  const body = document.getElementById(`body-${id}`);
+  const toggle = hdr.querySelector('.card-toggle');
+  const isOpen = body.classList.contains('open');
+  const shouldOpen = force !== undefined ? force : !isOpen;
+  body.classList.toggle('open', shouldOpen);
+  hdr.classList.toggle('open', shouldOpen);
 }
 
-function validarCampo(input) {
-  if (input.value.trim()) {
-    input.classList.remove('invalid');
-    input.classList.add('valid');
-  } else {
-    input.classList.remove('valid');
-    input.classList.add('invalid');
+function expandAll(){ ['hosp','cfg','check','reun','pred','csc','esp','al','vis','ag'].forEach(id => toggleCard(id,true)) }
+function collapseAll(){ ['hosp','cfg','check','reun','pred','csc','esp','al','vis','ag'].forEach(id => toggleCard(id,false)) }
+
+// ───────────────────────────────────────────
+// SCROLL NAV
+// ───────────────────────────────────────────
+function scrollTo(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  const secId = id.replace('sec-','');
+  toggleCard(secId, true);
+}
+
+// ───────────────────────────────────────────
+// MAPS
+// ───────────────────────────────────────────
+function onMaps(inputId, containerId){
+  const val = document.getElementById(inputId)?.value?.trim();
+  const ct = document.getElementById(containerId);
+  if(!ct) return;
+  if(val && val.length > 5){
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val)}`;
+    ct.innerHTML = `<a href="${url}" target="_blank" class="maps-link">🗺️ Ver "${val.substring(0,32)}${val.length>32?'…':''}" en Maps →</a>`;
+  } else { ct.innerHTML = '' }
+}
+function openMaps(inputId){
+  const val = document.getElementById(inputId)?.value;
+  if(!val){ toast('⚠️ Escriba una dirección primero','wa'); return }
+  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(val)}`, '_blank');
+}
+function mapsUrl(dir){ return `https://maps.google.com/?q=${encodeURIComponent(dir)}` }
+
+// ───────────────────────────────────────────
+// PHONE FORMAT
+// ───────────────────────────────────────────
+function fmtPhone(el){
+  let v = el.value.replace(/\D/g,'');
+  if(v.length <= 10){
+    if(v.length > 6) v = v.slice(0,3)+' '+v.slice(3,6)+' '+v.slice(6);
+    else if(v.length > 3) v = v.slice(0,3)+' '+v.slice(3);
   }
+  el.value = v;
 }
 
-function iniciarAutoSave() {
-  autoSaveInterval = setInterval(() => {
-    guardarEnLocalStorage();
-  }, 3000);
-  window.addEventListener('beforeunload', guardarEnLocalStorage);
+// ───────────────────────────────────────────
+// HOSPEDAJE TOGGLE
+// ───────────────────────────────────────────
+function toggleHosp(tipo, i){
+  const inp = document.getElementById(`al_${tipo}${i}`);
+  const div = document.getElementById(`div_al_${tipo}${i}`);
+  const lk = document.getElementById(`lk_al_${tipo}${i}`);
+  if(!inp || !div) return;
+  const isHosp = inp.value.trim().toLowerCase().includes('hospedaje');
+  div.classList.toggle('show', !isHosp);
+  div.style.display = isHosp ? 'none' : 'block';
+  if(lk) lk.innerHTML = isHosp ? '<span class="hosp-badge">🏠 En el hospedaje</span>' : '';
 }
 
-function guardarEnLocalStorage() {
-  const datos = {};
-  document.querySelectorAll('input, select, textarea').forEach(el => {
-    if (el.id) datos[el.id] = el.value;
-  });
-  datos['_vc'] = vc;
-  localStorage.setItem('sc_chi03_datos_v2', JSON.stringify(datos));
-}
-
-function cargarDatosLocalStorage() {
-  try {
-    const guardado = localStorage.getItem('sc_chi03_datos_v2');
-    if (!guardado) return;
-    
-    const datos = JSON.parse(guardado);
-    Object.keys(datos).forEach(key => {
-      if (key === '_vc') {
-        for (let i = vc; i < datos[key]; i++) addVis();
-      } else {
-        const el = document.getElementById(key);
-        if (el) {
-          el.value = datos[key];
-          el.dispatchEvent(new Event('input'));
-        }
-      }
-    });
-    showToast('💾 Datos anteriores recuperados automáticamente', 'success');
-  } catch(e) {
-    console.error('Error cargando datos:', e);
-  }
-}
-
-function exportarDatos() {
-  const datos = {};
-  document.querySelectorAll('input, select, textarea').forEach(el => {
-    if (el.id) datos[el.id] = el.value;
-  });
-  datos['_vc'] = vc;
-  
-  const blob = new Blob([JSON.stringify(datos, null, 2)], {type: 'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `SC_CHI03_backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('✅ Datos exportados correctamente', 'success');
-}
-
-function importarDatos(input) {
-  const file = input.files[0];
-  if (!file) return;
-  
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    try {
-      const datos = JSON.parse(e.target.result);
-      Object.keys(datos).forEach(key => {
-        if (key === '_vc') {
-          for (let i = vc; i < datos[key]; i++) addVis();
-        } else {
-          const el = document.getElementById(key);
-          if (el) {
-            el.value = datos[key];
-            el.dispatchEvent(new Event('input'));
-          }
-        }
-      });
-      showToast('✅ Datos importados correctamente', 'success');
-    } catch(err) {
-      showToast('❌ Error al importar: archivo inválido', 'error');
-    }
-  };
-  reader.readAsText(file);
-  input.value = '';
-}
-
-function limpiarFormulario() {
-  if (!confirm('¿Está seguro de limpiar TODOS los campos? Esta acción no se puede deshacer.')) return;
-  
-  document.querySelectorAll('input:not([type="checkbox"]), select, textarea').forEach(el => {
-    if (el.id && !el.id.startsWith('tema_')) {
-      el.value = '';
-      el.classList.remove('valid', 'invalid');
-    }
-  });
-  
-  document.getElementById('r1l').value = 'SALÓN DEL REINO';
-  document.getElementById('r2l').value = 'EN DÓNDE DECIDA EL CUERPO DE ANCIANOS';
-  document.getElementById('r3l').value = 'EN DÓNDE DECIDA EL CUERPO DE ANCIANOS';
-  document.getElementById('r4l').value = 'SALÓN DEL REINO';
-  document.getElementById('wa').value = '526121418717';
-  
-  localStorage.removeItem('sc_chi03_datos_v2');
-  showToast('🧹 Formulario limpiado', 'success');
-  actualizarProgreso();
-}
-
-function toggleTheme() {
-  const html = document.documentElement;
-  const actual = html.getAttribute('data-theme');
-  const nuevo = actual === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', nuevo);
-  localStorage.setItem('sc_chi03_tema', nuevo);
-  showToast(nuevo === 'dark' ? '🌙 Modo oscuro activado' : '☀️ Modo claro activado', 'success');
-}
-
-function verificarTemaGuardado() {
-  const tema = localStorage.getItem('sc_chi03_tema');
-  if (tema) document.documentElement.setAttribute('data-theme', tema);
-}
-
-function showToast(mensaje, tipo = 'info') {
-  const container = document.getElementById('toastContainer');
-  const toast = document.createElement('div');
-  toast.className = `toast ${tipo}`;
-  toast.innerHTML = `
-    <span>${mensaje}</span>
-    <button class="toast-close" onclick="this.parentElement.remove()">×</button>
-  `;
-  container.appendChild(toast);
-  
-  setTimeout(() => {
-    toast.style.animation = 'toastOut 0.4s ease forwards';
-    setTimeout(() => toast.remove(), 400);
-  }, 4000);
-}
-
-function mostrarLoginAdmin() {
-  document.getElementById('passwordOverlay').classList.add('active');
-  document.getElementById('passwordModal').classList.add('active');
-  document.getElementById('passwordInput').value = '';
-  document.getElementById('passwordError').style.display = 'none';
-  setTimeout(() => document.getElementById('passwordInput').focus(), 100);
-}
-
-function cerrarLoginAdmin() {
-  document.getElementById('passwordOverlay').classList.remove('active');
-  document.getElementById('passwordModal').classList.remove('active');
-}
-
-function verificarPassword() {
-  if (document.getElementById('passwordInput').value === 'admin123') {
-    cerrarLoginAdmin();
-    document.getElementById('adminSection').classList.add('active');
-    document.getElementById('adminSection').scrollIntoView({ behavior: 'smooth' });
-    showToast('🔓 Modo Administrador activado', 'success');
-  } else {
-    document.getElementById('passwordError').style.display = 'block';
-    document.getElementById('passwordInput').value = '';
-    document.getElementById('passwordInput').focus();
-  }
-}
-
-function guardarTemas() {
-  showToast('✅ Temas guardados. Se aplicarán al generar el PDF.', 'success');
-}
-
-function restaurarTemas() {
-  if (!confirm('¿Restaurar temas originales del CHI-03?')) return;
-  document.getElementById('tema_martes').value = temasDefault.martes;
-  document.getElementById('tema_miercoles').value = temasDefault.miercoles;
-  document.getElementById('tema_viernes').value = temasDefault.viernes;
-  document.getElementById('tema_sabado').value = temasDefault.sabado;
-  document.getElementById('tema_2do').value = temasDefault.segundo;
-  showToast('↩️ Temas restaurados a valores originales', 'success');
-}
-
-function abrirAyuda() {
-  document.getElementById('helpOverlay').classList.add('active');
-  document.getElementById('helpModal').classList.add('active');
-  document.body.style.overflow = 'hidden';
-}
-
-function cerrarAyuda() {
-  document.getElementById('helpOverlay').classList.remove('active');
-  document.getElementById('helpModal').classList.remove('active');
-  document.body.style.overflow = 'auto';
-}
-
-function mostrarSeccionAyuda(id, btn) {
-  ['inicio','primeravez','pasoapaso','problemas','faq'].forEach(s => {
-    document.getElementById('ayuda-'+s).style.display = 'none';
-  });
-  document.getElementById('ayuda-'+id).style.display = 'block';
-  
-  const buttons = btn.parentNode.querySelectorAll('button');
-  buttons.forEach(b => {
-    b.classList.remove('btn');
-    b.classList.add('btn-outline');
-  });
-  btn.classList.remove('btn-outline');
-  btn.classList.add('btn');
-}
-
-function generarLinkMaps(inputId, containerId) {
-  const input = document.getElementById(inputId);
-  const container = document.getElementById(containerId);
-  if (!input || !container) return;
-  
-  input.addEventListener('input', function() {
-    const direccion = this.value.trim();
-    if (direccion.length > 5) {
-      const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
-      container.innerHTML = `<a href="${url}" target="_blank" class="maps-link">🗺️ Ver en Google Maps →</a>`;
-    } else {
-      container.innerHTML = '';
-    }
-  });
-}
-
-function actualizarPreviewMaps(inputId, containerId) {
-  const input = document.getElementById(inputId);
-  const container = document.getElementById(containerId);
-  if (!input || !container) return;
-  
-  const direccion = input.value.trim();
-  if (direccion.length > 5) {
-    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`;
-    container.innerHTML = `<a href="${url}" target="_blank" class="maps-link">🗺️ Ver "${direccion.substring(0,35)}${direccion.length>35?'...':''}" en Maps →</a>`;
-  } else {
-    container.innerHTML = '';
-  }
-}
-
-function abrirMaps(inputId) {
-  const direccion = document.getElementById(inputId)?.value;
-  if (!direccion) { showToast('⚠️ Primero escriba una dirección', 'warning'); return; }
-  window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(direccion)}`, '_blank');
-}
-
-function toggleDireccionHospedaje(tipo, index) {
-  const lugarInput = document.getElementById(`al_${tipo}${index}`);
-  const direccionDiv = document.getElementById(`div_al_${tipo}_dir${index}`);
-  const telefonoInput = document.getElementById(`al_${tipo}_tel${index}`);
-  const linkDiv = document.getElementById(`link_al_${tipo}_dir${index}`);
-  
-  if (!lugarInput || !direccionDiv) return;
-  
-  const esHospedaje = lugarInput.value.trim().toLowerCase().includes('hospedaje');
-  
-  if (esHospedaje) {
-    direccionDiv.classList.remove('visible');
-    direccionDiv.style.display = 'none';
-    if (telefonoInput) telefonoInput.style.display = 'none';
-    if (linkDiv) linkDiv.innerHTML = '<span class="hospedaje-badge">🏠 En el hospedaje</span>';
-    const dirInput = document.getElementById(`al_${tipo}_dir${index}`);
-    if (dirInput) dirInput.value = 'En el hospedaje';
-  } else {
-    direccionDiv.style.display = 'block';
-    direccionDiv.classList.add('visible');
-    if (telefonoInput) telefonoInput.style.display = 'block';
-    if (linkDiv) linkDiv.innerHTML = '';
-    const dirInput = document.getElementById(`al_${tipo}_dir${index}`);
-    if (dirInput && dirInput.value === 'En el hospedaje') dirInput.value = '';
-  }
-}
-
-function toggleChecklist(item) {
-  const checkbox = item.querySelector('input[type="checkbox"]');
-  checkbox.checked = !checkbox.checked;
-  item.classList.toggle('checked', checkbox.checked);
-}
-
-function addVis() {
-  const index = vc;
-  const container = document.getElementById('vis');
-  const div = document.createElement('div');
-  div.id = `vr${index}`;
-  div.style.cssText = 'margin-bottom:14px;padding:18px;background:var(--surface-2);border-radius:14px;position:relative;border-left:4px solid var(--primary);animation:fadeInUp 0.4s ease';
-  div.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px">
-      <div><label>Día</label><select id="vd${index}"><option>Mié</option><option>Jue</option><option>Vie</option><option>Sáb</option><option>Dom</option></select></div>
-      <div><label>Hora</label><input type="time" id="vh${index}"></div>
+// ───────────────────────────────────────────
+// VISITS
+// ───────────────────────────────────────────
+function addVis(){
+  const i = vc;
+  const ct = document.getElementById('visGrid');
+  const d = document.createElement('div');
+  d.id = `vr${i}`;
+  d.className = 'vis-item';
+  d.innerHTML = `
+    <div class="g2" style="margin-bottom:10px">
+      <div><label>Día</label><select id="vd${i}"><option>Mié</option><option>Jue</option><option>Vie</option><option>Sáb</option><option>Dom</option></select></div>
+      <div><label>Hora</label><input type="time" id="vh${i}"></div>
     </div>
-    <div style="margin-bottom:12px"><label>Familia</label><input id="vf${index}" placeholder="Apellido de la familia"></div>
-    <div style="margin-bottom:12px"><label>Anciano / SM</label><input id="va${index}" placeholder="Nombre"></div>
-    <div style="background:var(--primary-light);padding:16px;border-radius:12px;margin-bottom:12px">
-      <label style="color:var(--primary);font-size:0.95rem">📍 Dirección Completa</label>
-      <input id="vdir${index}" placeholder="Calle, número, colonia, ciudad" style="margin-bottom:10px" oninput="actualizarPreviewMaps('vdir${index}','link_vdir${index}')">
-      <input id="vtel${index}" placeholder="📞 Teléfono" style="margin-bottom:10px">
-      <div id="link_vdir${index}"></div>
-      <div class="contacto-box" style="margin-top:12px;font-size:0.85rem">💡 Referencia: "casa blanca con portón negro, frente a farmacia"</div>
+    <div class="g2" style="margin-bottom:10px">
+      <div><label>Familia</label><input id="vf${i}" placeholder="Apellido familia"></div>
+      <div><label>Anciano / SM</label><input id="va${i}" placeholder="Responsable"></div>
     </div>
-    ${index > 0 ? `<button type="button" class="btn-remove" onclick="eliminarVisita(${index})">✕ Eliminar</button>` : ''}
+    <div style="background:var(--p3);padding:14px;border-radius:var(--rs)">
+      <label style="color:var(--p)">📍 Dirección</label>
+      <input id="vdir${i}" placeholder="Calle, número, colonia" oninput="onMaps('vdir${i}','lkvdir${i}')" style="margin-bottom:8px">
+      <input id="vtel${i}" placeholder="📞 Teléfono" oninput="fmtPhone(this)">
+      <div id="lkvdir${i}"></div>
+    </div>
+    ${i>0?`<button type="button" class="btn-del" onclick="delVis(${i})">✕</button>`:''}
   `;
-  container.appendChild(div);
-  
-  setTimeout(() => generarLinkMaps(`vdir${index}`, `link_vdir${index}`), 100);
+  ct.appendChild(d);
   vc++;
-  actualizarProgreso();
+  updateProgress();
+}
+function delVis(i){
+  const el = document.getElementById(`vr${i}`);
+  if(el){ el.style.opacity='0'; setTimeout(()=>{ el.remove(); updateProgress() }, 250) }
 }
 
-function eliminarVisita(index) {
-  const el = document.getElementById(`vr${index}`);
-  if (el) {
-    el.style.animation = 'fadeInUp 0.3s ease reverse forwards';
-    setTimeout(() => el.remove(), 300);
-  }
-}
-
-function actualizarProgreso() {
-  const campos = document.querySelectorAll('input[required], input[id$="d"]:not([id^="al_d"])');
-  let completados = 0;
-  let total = 0;
-  
-  campos.forEach(c => {
-    if (c.offsetParent !== null) {
-      total++;
-      if (c.value.trim()) completados++;
-    }
-  });
-  
-  const porcentaje = total > 0 ? Math.min((completados / total) * 100, 100) : 0;
-  document.getElementById('progressBar').style.width = porcentaje + '%';
-  document.getElementById('progressText').textContent = Math.round(porcentaje) + '% Completado';
-  document.getElementById('fieldsCount').textContent = `${completados}/${total} campos`;
-  
-  const items = document.querySelectorAll('.timeline-item');
-  items.forEach((item, i) => {
-    item.classList.remove('completed', 'active');
-    if (porcentaje >= (i / items.length) * 100) item.classList.add('completed');
-  });
-}
-
-document.addEventListener('input', actualizarProgreso);
-
-function enviarResumenUbicaciones() {
-  const waNum = document.getElementById('wa').value.replace(/\D/g,'') || '526121418717';
-  const cong = document.getElementById('cong').value || '______________';
-  const fec = document.getElementById('fec').value || '______________';
-  
-  let mensaje = `📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n`;
-  
-  const scDir = document.getElementById('sc_direccion').value;
-  if (scDir) {
-    mensaje += `🏠 *HOSPEDAJE SC:*\n📍 ${scDir}\n📞 ${document.getElementById('sc_telefono').value||'-'}\n🗺️ ${generarUrlMaps(scDir)}\n\n`;
-  }
-  
-  mensaje += `*📅 REUNIONES:*\n\n`;
+// ───────────────────────────────────────────
+// CONFLICT DETECTION
+// ───────────────────────────────────────────
+function toMin(t){ if(!t) return null; const [h,m]=t.split(':'); return parseInt(h)*60+parseInt(m) }
+function detectConflicts(){
   const reuniones = [
-    {n:'Martes - 1er Discurso', d:'r1d', t:'r1t', h:'r1h'},
-    {n:(document.getElementById('r2d')?.value||'Miércoles')+' - Precursores', d:'r2d_dir', t:'r2t', h:'r2h'},
-    {n:'Viernes - Ancianos/SM', d:'r3d', t:'r3t', h:'r3h'},
-    {n:(document.getElementById('r4d')?.value||'Sábado')+' - Discurso Público', d:'r4d_dir', t:'r4t', h:'r4h'}
+    {n:'Martes (1er Disc.)', d:'Martes', h:document.getElementById('r1h')?.value},
+    {n:`${document.getElementById('r2d')?.value||'Mié.'} (Precursores)`, d:document.getElementById('r2d')?.value||'Mié', h:document.getElementById('r2h')?.value},
+    {n:'Viernes (Ancianos/SM)', d:'Viernes', h:document.getElementById('r3h')?.value},
+    {n:`${document.getElementById('r4d')?.value||'Sáb.'} (Disc. Público)`, d:document.getElementById('r4d')?.value||'Sáb', h:document.getElementById('r4h')?.value},
   ];
-  
-  reuniones.forEach(r => {
-    const dirEl = document.getElementById(r.d);
-    const dir = dirEl ? dirEl.value : '';
-    if (dir) {
-      mensaje += `• *${r.n}*\n`;
-      const hEl = document.getElementById(r.h);
-      if (hEl && hEl.value) mensaje += `🕐 ${hEl.value}\n`;
-      mensaje += `📍 ${dir}\n`;
-      const tEl = document.getElementById(r.t);
-      if (tEl && tEl.value) mensaje += `📞 ${tEl.value}\n`;
-      mensaje += `🗺️ ${generarUrlMaps(dir)}\n\n`;
-    }
-  });
-  
-  let msgAlim = `*🍽️ ALIMENTOS:*\n\n`;
-  let tieneAlim = false;
-  pref.forEach((_,i) => {
-    const c = document.getElementById(`al_c${i}`)?.value;
-    const cDir = document.getElementById(`al_c_dir${i}`)?.value;
-    const n = document.getElementById(`al_n${i}`)?.value;
-    const nDir = document.getElementById(`al_n_dir${i}`)?.value;
-    
-    if (c || n) {
-      tieneAlim = true;
-      msgAlim += `*${dias[i]}:*\n`;
-      if (c) {
-        msgAlim += `🍖 ${c}\n`;
-        if (cDir && !cDir.toLowerCase().includes('hospedaje')) {
-          msgAlim += `📍 ${cDir}\n🗺️ ${generarUrlMaps(cDir)}\n`;
-        } else if (cDir && cDir.toLowerCase().includes('hospedaje')) {
-          msgAlim += `🏠 En el hospedaje\n`;
-        }
-      }
-      if (n) {
-        msgAlim += `🌙 ${n}\n`;
-        if (nDir && !nDir.toLowerCase().includes('hospedaje')) {
-          msgAlim += `📍 ${nDir}\n🗺️ ${generarUrlMaps(nDir)}\n`;
-        } else if (nDir && nDir.toLowerCase().includes('hospedaje')) {
-          msgAlim += `🏠 En el hospedaje\n`;
-        }
-      }
-      msgAlim += `\n`;
-    }
-  });
-  if (tieneAlim) mensaje += msgAlim;
-  
-  let msgVis = `*🏠 VISITAS:*\n\n`;
-  let tieneVis = false;
-  for (let i=0; i<vc; i++) {
-    const r = document.getElementById(`vr${i}`);
-    if (r) {
-      const dia = document.getElementById(`vd${i}`)?.value||'';
-      const hora = document.getElementById(`vh${i}`)?.value||'';
-      const fam = document.getElementById(`vf${i}`)?.value||'';
-      const dir = document.getElementById(`vdir${i}`)?.value||'';
-      if (dir) {
-        tieneVis = true;
-        msgVis += `• *${dia}${hora?' - '+hora:''}*\n`;
-        if (fam) msgVis += `👨‍👩‍👧‍👦 ${fam}\n`;
-        msgVis += `📍 ${dir}\n🗺️ ${generarUrlMaps(dir)}\n\n`;
+  const conflicts = [];
+  for(let a=0; a<reuniones.length; a++){
+    for(let b=a+1; b<reuniones.length; b++){
+      const ra = reuniones[a], rb = reuniones[b];
+      if(!ra.h || !rb.h) continue;
+      if(ra.d !== rb.d) continue;
+      const ma = toMin(ra.h), mb = toMin(rb.h);
+      if(Math.abs(ma-mb) < 90){
+        conflicts.push(`⚠️ <strong>${ra.n}</strong> y <strong>${rb.n}</strong> se solapan (menos de 90 min de diferencia)`);
       }
     }
   }
-  if (tieneVis) mensaje += msgVis;
-  
-  mensaje += `\n💡 *Para rutas:* Abra cualquier enlace en Google Maps y toque "Cómo llegar"`;
-  window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(mensaje)}`, '_blank');
-}
-
-function generarUrlMaps(direccion) {
-  return `https://maps.google.com/?q=${encodeURIComponent(direccion)}`;
-}
-
-async function generarPDFData() {
-  if (typeof window.jspdf === 'undefined' || !window.jspdf.jsPDF) {
-    throw new Error('Las librerías PDF aún están cargando. Espere unos segundos e intente de nuevo.');
+  const alert = document.getElementById('conflictAlert');
+  const list = document.getElementById('conflictList');
+  const pill = document.getElementById('conflictPill');
+  if(conflicts.length > 0){
+    alert.classList.add('active');
+    list.innerHTML = conflicts.map(c=>`<div class="conflict-item">${c}</div>`).join('');
+    pill.style.display = 'flex';
+    pill.className = 'stat-pill err';
+    pill.textContent = `${conflicts.length} conflicto${conflicts.length>1?'s':''}`;
+  } else {
+    alert.classList.remove('active');
+    pill.style.display = 'none';
   }
-  
-  const {jsPDF} = window.jspdf;
-  const doc = new jsPDF();
-  const W = doc.internal.pageSize.getWidth();
-  const M = 14;
-  
-  const headerColor = [0, 102, 204];
-  
-  doc.setFillColor(...headerColor);
-  doc.rect(0, 0, W, 40, 'F');
-  doc.setTextColor(255);
-  doc.setFontSize(15);
-  doc.setFont(undefined, 'bold');
-  doc.text('PROGRAMA DE ACTIVIDADES DURANTE LA VISITA DEL SC', W/2, 16, {align:'center'});
-  doc.setFontSize(12);
-  doc.text('A LA CONGREGACIÓN', W/2, 25, {align:'center'});
-  doc.setFontSize(10);
-  doc.setFont(undefined, 'normal');
-  doc.text('FECHA: MARZO A AGOSTO DE 2026', W/2, 33, {align:'center'});
-  
-  const cong = document.getElementById('cong').value.toUpperCase() || '______________';
-  const fec = document.getElementById('fec').value || '______________';
-  doc.setFontSize(9);
-  doc.text(`CONGREGACIÓN: ${cong}   FECHA: ${fec}`, M, 38);
-  
-  const temaMartes = document.getElementById('tema_martes')?.value || temasDefault.martes;
-  const temaMierc = document.getElementById('tema_miercoles')?.value || temasDefault.miercoles;
-  const temaViern = document.getElementById('tema_viernes')?.value || temasDefault.viernes;
-  const temaSab = document.getElementById('tema_sabado')?.value || temasDefault.sabado;
-  const tema2do = document.getElementById('tema_2do')?.value || temasDefault.segundo;
-  
-  let y = 46;
-  const chk = (n=15) => {
-    if (y + n > doc.internal.pageSize.getHeight() - 20) {
-      doc.addPage();
-      y = 18;
-    }
+}
+
+// ───────────────────────────────────────────
+// PROGRESS
+// ───────────────────────────────────────────
+function updateProgress(){
+  const req = document.querySelectorAll('input[required]');
+  let total=0, done=0;
+  req.forEach(el => { if(el.offsetParent!==null){ total++; if(el.value.trim()) done++ } });
+  const pct = total>0 ? Math.round((done/total)*100) : 0;
+  document.getElementById('progBar').style.width = pct+'%';
+  document.getElementById('pctText').textContent = pct+'%';
+  document.getElementById('fieldsCount').textContent = `${done}/${total} campos obligatorios`;
+
+  // Section badges
+  updateSectionBadge('hosp', ['sc_dir','sc_tel'], 2);
+  updateSectionBadge('cfg', ['cong','fec'], 2);
+  updateCheckBadge();
+  updateSectionBadge('reun', ['r1h','r2h','r3h','r4h'], 4);
+  updateSectionBadgeByPattern('pred', 'pg_', 10);
+  updateSectionBadgeByPattern('csc', 'sc_m', 5);
+  updateSectionBadgeByPattern('esp', 'sp_m', 5);
+  updateAlBadge();
+  updateVisBadge();
+  updateSectionBadge('ag', ['ag1','ag2','ag3'], 3);
+  detectConflicts();
+}
+
+function updateSectionBadge(sec, ids, total){
+  const done = ids.filter(id => { const el=document.getElementById(id); return el&&el.value.trim() }).length;
+  setBadge(sec, done, total);
+}
+function updateSectionBadgeByPattern(sec, prefix, total){
+  let done=0;
+  for(let i=0;i<5;i++){ const el=document.getElementById(prefix+i); if(el&&el.value.trim()) done++ }
+  setBadge(sec, done, total);
+}
+function updateCheckBadge(){
+  const items = document.querySelectorAll('#chklist .chk-item');
+  const done = document.querySelectorAll('#chklist .chk-item.done').length;
+  const badge = document.getElementById('badge-check');
+  const bar = document.getElementById('mbar-check');
+  const pct = items.length>0 ? (done/items.length)*100 : 0;
+  bar.style.width = pct+'%';
+  badge.textContent = `${done}/${items.length}`;
+  badge.className = `sec-badge ${done===items.length?'complete':done>0?'partial':'empty'}`;
+}
+function updateAlBadge(){
+  let done=0, total=0;
+  DIAS.forEach((_,i) => { ['c','n'].forEach(t => { total++; const el=document.getElementById(`al_${t}${i}`); if(el&&el.value.trim()) done++ }) });
+  setBadge('al', done, total);
+}
+function updateVisBadge(){
+  let cnt=0;
+  for(let i=0;i<vc;i++){ const el=document.getElementById(`vdir${i}`); if(el&&el.value.trim()) cnt++ }
+  const badge = document.getElementById('badge-vis');
+  const bar = document.getElementById('mbar-vis');
+  bar.style.width = cnt>0 ? '100%' : '0%';
+  badge.textContent = `${cnt} visita${cnt!==1?'s':''}`;
+  badge.className = `sec-badge ${cnt>0?'complete':'empty'}`;
+}
+function setBadge(sec, done, total){
+  const badge = document.getElementById(`badge-${sec}`);
+  const bar = document.getElementById(`mbar-${sec}`);
+  if(!badge||!bar) return;
+  const pct = total>0 ? (done/total)*100 : 0;
+  bar.style.width = pct+'%';
+  if(done===0){ badge.className='sec-badge empty'; badge.textContent='vacío' }
+  else if(done===total){ badge.className='sec-badge complete'; badge.textContent='✓ completo' }
+  else{ badge.className='sec-badge partial'; badge.textContent=`${done}/${total}` }
+}
+
+// ───────────────────────────────────────────
+// CHECKLIST / TIMELINE
+// ───────────────────────────────────────────
+function chkToggle(item){ const cb=item.querySelector('input'); cb.checked=!cb.checked; item.classList.toggle('done',cb.checked); updateProgress() }
+function tlClick(el, i){ document.querySelectorAll('.tl-item').forEach(t=>t.classList.remove('now')); el.classList.add('now') }
+
+// ───────────────────────────────────────────
+// THEME
+// ───────────────────────────────────────────
+function toggleTheme(){
+  const d = document.documentElement;
+  const n = d.getAttribute('data-theme')==='dark'?'light':'dark';
+  d.setAttribute('data-theme',n); localStorage.setItem('sc_theme',n);
+  toast(n==='dark'?'🌙 Modo oscuro':'☀️ Modo claro','ok');
+}
+function loadTheme(){ const t=localStorage.getItem('sc_theme'); if(t) document.documentElement.setAttribute('data-theme',t) }
+
+// ───────────────────────────────────────────
+// TOAST
+// ───────────────────────────────────────────
+function toast(msg, type=''){
+  const ct=document.getElementById('toastCt');
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  el.innerHTML=`<span>${msg}</span><button class="toast-x" onclick="this.parentElement.remove()">×</button>`;
+  ct.appendChild(el);
+  setTimeout(()=>{ el.style.animation='toast-out .35s ease forwards'; setTimeout(()=>el.remove(),350) }, 4000);
+}
+
+// ───────────────────────────────────────────
+// SAVE / LOAD
+// ───────────────────────────────────────────
+function saveData(){
+  const d={};
+  document.querySelectorAll('input,select,textarea').forEach(el=>{ if(el.id) d[el.id]=el.value });
+  d._vc=vc;
+  localStorage.setItem('sc_chi03_v3',JSON.stringify(d));
+}
+function loadData(){
+  try{
+    const raw=localStorage.getItem('sc_chi03_v3');
+    if(!raw) return;
+    const d=JSON.parse(raw);
+    if(d._vc && d._vc > vc){ for(let i=vc;i<d._vc;i++) addVis() }
+    Object.keys(d).forEach(k=>{
+      if(k==='_vc') return;
+      const el=document.getElementById(k);
+      if(el){ el.value=d[k]; el.dispatchEvent(new Event('input')) }
+    });
+    setTimeout(updateProgress,200);
+    toast('💾 Datos anteriores restaurados','ok');
+  }catch(e){}
+}
+
+// ───────────────────────────────────────────
+// EXPORT / IMPORT / CLEAR
+// ───────────────────────────────────────────
+function exportData(){
+  const d={};
+  document.querySelectorAll('input,select,textarea').forEach(el=>{ if(el.id) d[el.id]=el.value });
+  d._vc=vc;
+  const b=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(b);
+  const a=document.createElement('a');
+  a.href=u; a.download=`SC_CHI03_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(u);
+  toast('✅ Datos exportados','ok');
+}
+function importData(input){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(d._vc&&d._vc>vc) for(let i=vc;i<d._vc;i++) addVis();
+      Object.keys(d).forEach(k=>{
+        if(k==='_vc') return;
+        const el=document.getElementById(k);
+        if(el){ el.value=d[k]; el.dispatchEvent(new Event('input')) }
+      });
+      toast('✅ Datos importados','ok');
+    }catch{ toast('❌ Archivo inválido','er') }
   };
+  r.readAsText(f); input.value='';
+}
+function clearAll(){
+  if(!confirm('¿Limpiar TODOS los campos? No se puede deshacer.')) return;
+  document.querySelectorAll('input:not([type=checkbox]),select,textarea').forEach(el=>{
+    if(el.id&&!el.id.startsWith('t_')) el.value='';
+  });
+  ['r1l','r2l','r3l','r4l'].forEach((id,i)=>{
+    document.getElementById(id).value=['SALÓN DEL REINO','EN DÓNDE DECIDA EL CUERPO DE ANCIANOS','EN DÓNDE DECIDA EL CUERPO DE ANCIANOS','SALÓN DEL REINO'][i];
+  });
+  document.getElementById('wa').value='526121418717';
+  localStorage.removeItem('sc_chi03_v3');
+  toast('🧹 Formulario limpiado','ok');
+  updateProgress();
+}
+
+// ───────────────────────────────────────────
+// SHARE URL
+// ───────────────────────────────────────────
+function shareURL(){
+  const d={};
+  ['cong','fec','sc_dir','sc_tel','wa','r1h','r1l','r1d','r1t','r2h','r2l','r2d_dir','r2t','r3h','r3l','r3d','r3t','r4h','r4l','r4d_dir','r4t'].forEach(id=>{
+    const el=document.getElementById(id); if(el&&el.value) d[id]=el.value;
+  });
+  try{
+    const encoded = btoa(encodeURIComponent(JSON.stringify(d)));
+    const url = `${location.href.split('#')[0]}#data=${encoded}`;
+    navigator.clipboard.writeText(url).then(()=>toast('🔗 Enlace copiado al portapapeles','ok')).catch(()=>{
+      prompt('Copie este enlace:', url);
+    });
+  }catch{ toast('❌ Error al generar enlace','er') }
+}
+function checkURLData(){
+  const hash = location.hash;
+  if(!hash.startsWith('#data=')) return;
+  try{
+    const d = JSON.parse(decodeURIComponent(atob(hash.slice(6))));
+    Object.keys(d).forEach(k=>{
+      const el=document.getElementById(k);
+      if(el){ el.value=d[k]; el.dispatchEvent(new Event('input')) }
+    });
+    history.replaceState(null,'',location.pathname);
+    toast('🔗 Datos del enlace compartido cargados','ok');
+  }catch{}
+}
+
+// ───────────────────────────────────────────
+// ADMIN
+// ───────────────────────────────────────────
+function openAdmin(){
+  document.getElementById('pwModal').classList.add('on');
+  document.getElementById('pwOverlay').classList.add('on');
+  setTimeout(()=>document.getElementById('pwInp').focus(),100);
+}
+function closePW(){
+  document.getElementById('pwModal').classList.remove('on');
+  document.getElementById('pwOverlay').classList.remove('on');
+}
+function verifyPW(){
+  if(document.getElementById('pwInp').value==='admin123'){
+    closePW();
+    document.getElementById('adminWrap').classList.add('open');
+    document.getElementById('adminWrap').scrollIntoView({behavior:'smooth'});
+    toast('🔓 Modo Admin activado','ok');
+  } else {
+    document.getElementById('pwErr').style.display='block';
+    document.getElementById('pwInp').value='';
+  }
+}
+function restoreTopics(){
+  if(!confirm('¿Restaurar temas originales?')) return;
+  document.getElementById('t_mar').value=TEMAS_DEF.mar;
+  document.getElementById('t_mie').value=TEMAS_DEF.mie;
+  document.getElementById('t_vie').value=TEMAS_DEF.vie;
+  document.getElementById('t_sab').value=TEMAS_DEF.sab;
+  document.getElementById('t_2do').value=TEMAS_DEF.d2o;
+  toast('↩️ Temas restaurados','ok');
+}
+
+// ───────────────────────────────────────────
+// PREVIEW MODAL
+// ───────────────────────────────────────────
+function openPreview(){
+  const body = document.getElementById('prevBody');
+  const v = id => document.getElementById(id)?.value||'';
+  const row = (label, val) => `<div class="prev-row"><span class="prev-label">${label}</span><span class="prev-val ${val?'':'missing'}">${val||'— sin completar —'}</span></div>`;
   
-  const TS = {
-    theme: 'grid',
-    styles: {cellPadding: 2.5, fontSize: 7.8, overflow: 'linebreak', lineWidth: 0.1, font: 'helvetica'},
-    margin: {left: M, right: M},
-    headStyles: {fillColor: [230,240,250], textColor: [0,51,102], fontStyle: 'bold'},
-    alternateRowStyles: {fillColor: [248,249,250]},
-    tableWidth: 'auto'
+  body.innerHTML = `
+    <div class="prev-section">
+      <h4>📍 Hospedaje</h4>
+      ${row('Dirección', v('sc_dir'))}
+      ${row('Teléfono', v('sc_tel'))}
+    </div>
+    <div class="prev-section">
+      <h4>⚙️ General</h4>
+      ${row('Congregación', v('cong'))}
+      ${row('Fechas', v('fec'))}
+      ${row('WhatsApp SC', v('wa'))}
+    </div>
+    <div class="prev-section">
+      <h4>📅 Reuniones</h4>
+      ${row('Martes — Hora', v('r1h'))}
+      ${row('Martes — Lugar', v('r1l'))}
+      ${row('Martes — Dirección', v('r1d'))}
+      ${row(`${v('r2d')||'Mié.'} — Hora`, v('r2h'))}
+      ${row(`${v('r2d')||'Mié.'} — Dirección`, v('r2d_dir'))}
+      ${row('Viernes — Hora', v('r3h'))}
+      ${row('Viernes — Dirección', v('r3d'))}
+      ${row(`${v('r4d')||'Sáb.'} — Hora`, v('r4h'))}
+      ${row(`${v('r4d')||'Sáb.'} — Dirección`, v('r4d_dir'))}
+    </div>
+    <div class="prev-section">
+      <h4>🍽️ Alimentos</h4>
+      ${DIAS.map((d,i)=>`${row(d+' — Comida',v(`al_c${i}`))}${row(d+' — Cena',v(`al_n${i}`))}`).join('')}
+    </div>
+    <div class="prev-section">
+      <h4>🏠 Visitas</h4>
+      ${Array.from({length:vc},(_,i)=>{
+        const f=v(`vf${i}`),dir=v(`vdir${i}`);
+        return f||dir ? row(`${v(`vd${i}`)} ${v(`vh${i}`)}`,`${f} · ${dir}`) : '';
+      }).join('')||'<div class="prev-row"><span class="prev-val missing">Sin visitas registradas</span></div>'}
+    </div>
+    <div style="margin-top:20px;display:flex;gap:10px">
+      <button class="btn" onclick="closePrev();genPDF()">📄 Generar PDF</button>
+      <button class="btn" style="background:#6b7280" onclick="closePrev()">Cerrar</button>
+    </div>
+  `;
+  document.getElementById('prevModal').classList.add('on');
+  document.getElementById('prevOverlay').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closePrev(){
+  document.getElementById('prevModal').classList.remove('on');
+  document.getElementById('prevOverlay').classList.remove('on');
+  document.body.style.overflow='auto';
+}
+
+// ───────────────────────────────────────────
+// PDF GENERATION
+// ───────────────────────────────────────────
+async function buildPDF(){
+  if(typeof window.jspdf==='undefined'||!window.jspdf.jsPDF)
+    throw new Error('Librerías PDF aún cargando. Espere 10 segundos e intente de nuevo.');
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF();
+  const W=doc.internal.pageSize.getWidth();
+  const M=13;
+  const v = id => document.getElementById(id)?.value||'-';
+  const blue=[0,58,124], lightBlue=[230,240,255], teal=[0,100,80];
+
+  // HEADER
+  doc.setFillColor(...blue);
+  doc.rect(0,0,W,42,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(13);
+  doc.text('PROGRAMA DE ACTIVIDADES DURANTE LA VISITA DEL SC',W/2,14,{align:'center'});
+  doc.setFontSize(10); doc.setFont('helvetica','normal');
+  doc.text(`Congregación: ${v('cong').toUpperCase()}   |   Fecha: ${v('fec')}   |   CHI-03 • 2026`,W/2,23,{align:'center'});
+  doc.text(`SC: Gilberto Flores Fabián   |   Generado: ${new Date().toLocaleDateString('es-MX')}`,W/2,31,{align:'center'});
+
+  const TS={
+    theme:'grid',
+    styles:{cellPadding:2.2,fontSize:7.5,overflow:'linebreak',lineWidth:.1,font:'helvetica'},
+    margin:{left:M,right:M},
+    headStyles:{fillColor:lightBlue,textColor:blue,fontStyle:'bold',fontSize:7.8},
+    alternateRowStyles:{fillColor:[248,250,253]}
   };
-  
-  chk(45);
-  doc.autoTable({
-    ...TS,
-    startY: y,
-    head: [['DÍA','HORA','REUNIÓN','LUGAR','DIRECCIÓN','TELÉFONO']],
-    body: [
-      ['Martes', document.getElementById('r1h').value||'--', `1er disc.:\n${temaMartes}\n(Canción 76)`, document.getElementById('r1l').value||'-', document.getElementById('r1d').value||'-', document.getElementById('r1t').value||'-'],
-      [document.getElementById('r2d').value, document.getElementById('r2h').value||'--', `Precursores:\n${temaMierc}`, document.getElementById('r2l').value||'-', document.getElementById('r2d_dir').value||'-', document.getElementById('r2t').value||'-'],
-      ['Viernes', document.getElementById('r3h').value||'--', `Ancianos/SM:\n${temaViern}`, document.getElementById('r3l').value||'-', document.getElementById('r3d').value||'-', document.getElementById('r3t').value||'-'],
-      [document.getElementById('r4d').value, document.getElementById('r4h').value||'--', `Disc. Público:\n${temaSab}\n(Canc. 145)\n2do servicio:\n${tema2do}\n(Canc. 155)`, document.getElementById('r4l').value||'-', document.getElementById('r4d_dir').value||'-', document.getElementById('r4t').value||'-']
+
+  let y=46;
+  const chk=n=>{ if(y+n>doc.internal.pageSize.getHeight()-20){ doc.addPage(); y=16 } };
+
+  const tmar = document.getElementById('t_mar')?.value||TEMAS_DEF.mar;
+  const tmie = document.getElementById('t_mie')?.value||TEMAS_DEF.mie;
+  const tvie = document.getElementById('t_vie')?.value||TEMAS_DEF.vie;
+  const tsab = document.getElementById('t_sab')?.value||TEMAS_DEF.sab;
+  const t2do = document.getElementById('t_2do')?.value||TEMAS_DEF.d2o;
+
+  // Section title helper
+  const secTitle=(doc,y,txt,col=blue)=>{
+    doc.setFillColor(...col);
+    doc.rect(M,y,W-M*2,7,'F');
+    doc.setTextColor(255,255,255);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8);
+    doc.text(txt,M+3,y+5);
+    doc.setTextColor(0,0,0);
+    return y+9;
+  };
+
+  // REUNIONES
+  chk(50);
+  y=secTitle(doc,y,'📅 REUNIONES PROGRAMADAS');
+  doc.autoTable({...TS,startY:y,
+    head:[['DÍA','HORA','REUNIÓN / TEMA','LUGAR','DIRECCIÓN','TELÉFONO']],
+    body:[
+      ['Martes',v('r1h'),`1er Discurso:\n${tmar}\n(Canción 76)`,v('r1l'),v('r1d'),v('r1t')],
+      [v('r2d'),v('r2h'),`Precursores:\n${tmie}`,v('r2l'),v('r2d_dir'),v('r2t')],
+      ['Viernes',v('r3h'),`Ancianos/SM:\n${tvie}`,v('r3l'),v('r3d'),v('r3t')],
+      [v('r4d'),v('r4h'),`Disc. Público:\n${tsab} (Canc.145)\n2do Disc.:\n${t2do} (Canc.155)`,v('r4l'),v('r4d_dir'),v('r4t')]
     ],
-    columnStyles: {2: {cellWidth: 52}}
+    columnStyles:{2:{cellWidth:52}}
   });
-  y = doc.lastAutoTable.finalY + 5;
-  
-  chk(25);
-  doc.autoTable({
-    ...TS, startY: y,
-    head: [['DÍA','MAÑANA','TARDE','LUGAR','TERR.']],
-    body: pref.map((_,i) => [dias[i], document.getElementById(`pg_m${i}`).value||'-', document.getElementById(`pg_t${i}`).value||'-', document.getElementById(`pg_l${i}`).value||'-', document.getElementById(`pg_ter${i}`).value||'-'])
-  });
-  y = doc.lastAutoTable.finalY + 5;
-  
-  chk(25);
-  doc.autoTable({
-    ...TS, startY: y,
-    head: [['DÍA','MAÑANA','HERMANO','TARDE','HERMANO']],
-    body: pref.map((_,i) => [dias[i], document.getElementById(`sc_m${i}`).value||'-', document.getElementById(`sc_n1${i}`).value||'-', document.getElementById(`sc_t${i}`).value||'-', document.getElementById(`sc_n2${i}`).value||'-'])
-  });
-  y = doc.lastAutoTable.finalY + 5;
-  
-  chk(25);
-  doc.autoTable({
-    ...TS, startY: y,
-    head: [['DÍA','MAÑANA','HERMANA','TARDE','HERMANA']],
-    body: pref.map((_,i) => [dias[i], document.getElementById(`sp_m${i}`).value||'-', document.getElementById(`sp_n1${i}`).value||'-', document.getElementById(`sp_t${i}`).value||'-', document.getElementById(`sp_n2${i}`).value||'-'])
-  });
-  y = doc.lastAutoTable.finalY + 5;
-  
+  y=doc.lastAutoTable.finalY+5;
+
+  // PREDICACIÓN
   chk(35);
-  doc.autoTable({
-    ...TS, startY: y,
-    head: [['DÍA','DESAYUNO','COMIDA','DIR. COMIDA','TEL. COMIDA','CENA','DIR. CENA','TEL. CENA']],
-    body: pref.map((_,i) => {
-      const dVal = document.getElementById(`al_d${i}`)?.value;
-      const cVal = document.getElementById(`al_c${i}`)?.value;
-      const nVal = document.getElementById(`al_n${i}`)?.value;
-      const cDir = document.getElementById(`al_c_dir${i}`)?.value || '';
-      const nDir = document.getElementById(`al_n_dir${i}`)?.value || '';
-      return [
-        dias[i], dVal||'-', cVal||'-',
-        (cVal && cVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (cDir||'-'),
-        (cVal && cVal.toLowerCase().includes('hospedaje')) ? '-' : (document.getElementById(`al_c_tel${i}`)?.value||'-'),
-        nVal||'-',
-        (nVal && nVal.toLowerCase().includes('hospedaje')) ? 'En hospedaje' : (nDir||'-'),
-        (nVal && nVal.toLowerCase().includes('hospedaje')) ? '-' : (document.getElementById(`al_n_tel${i}`)?.value||'-')
-      ];
-    }),
-    styles: {fontSize: 7, cellPadding: 2},
-    columnStyles: {
-      0: {cellWidth: 20}, 1: {cellWidth: 26}, 2: {cellWidth: 26},
-      3: {cellWidth: 30}, 4: {cellWidth: 22},
-      5: {cellWidth: 26}, 6: {cellWidth: 30}, 7: {cellWidth: 22}
-    }
+  y=secTitle(doc,y,'📢 PREDICACIÓN GENERAL');
+  doc.autoTable({...TS,startY:y,
+    head:[['DÍA','MAÑANA','TARDE','LUGAR / PUNTO REUNIÓN','TERRITORIO']],
+    body:DIAS.map((_,i)=>[DIAS[i],v(`pg_m${i}`),v(`pg_t${i}`),v(`pg_l${i}`),v(`pg_ter${i}`)])
   });
-  y = doc.lastAutoTable.finalY + 5;
-  
+  y=doc.lastAutoTable.finalY+5;
+
+  // SC
+  chk(30);
+  y=secTitle(doc,y,'👤 CON EL SC',[0,80,40]);
+  doc.autoTable({...TS,startY:y,
+    headStyles:{fillColor:[210,240,225],textColor:[0,80,40],fontStyle:'bold'},
+    head:[['DÍA','MAÑANA','HERMANO','TARDE','HERMANO']],
+    body:DIAS.map((_,i)=>[DIAS[i],v(`sc_m${i}`),v(`sc_n1${i}`),v(`sc_t${i}`),v(`sc_n2${i}`)])
+  });
+  y=doc.lastAutoTable.finalY+5;
+
+  // ESPOSA
+  chk(30);
+  y=secTitle(doc,y,'👩 CON LA ESPOSA DEL SC',[80,0,120]);
+  doc.autoTable({...TS,startY:y,
+    headStyles:{fillColor:[235,225,255],textColor:[70,0,120],fontStyle:'bold'},
+    head:[['DÍA','MAÑANA','HERMANA','TARDE','HERMANA']],
+    body:DIAS.map((_,i)=>[DIAS[i],v(`sp_m${i}`),v(`sp_n1${i}`),v(`sp_t${i}`),v(`sp_n2${i}`)])
+  });
+  y=doc.lastAutoTable.finalY+5;
+
+  // ALIMENTOS
+  chk(40);
+  y=secTitle(doc,y,'🍽️ ALIMENTOS',[160,80,0]);
+  const alBody = DIAS.map((_,i)=>{
+    const cLugar=v(`al_c${i}`), nLugar=v(`al_n${i}`);
+    const cDir=cLugar.toLowerCase().includes('hospedaje')?'En hospedaje':v(`al_cd${i}`);
+    const nDir=nLugar.toLowerCase().includes('hospedaje')?'En hospedaje':v(`al_nd${i}`);
+    const cTel=cLugar.toLowerCase().includes('hospedaje')?'-':v(`al_ct${i}`);
+    const nTel=nLugar.toLowerCase().includes('hospedaje')?'-':v(`al_nt${i}`);
+    return [DIAS[i],v(`al_d${i}`),cLugar,cDir,cTel,nLugar,nDir,nTel];
+  });
+  doc.autoTable({...TS,startY:y,
+    headStyles:{fillColor:[255,240,210],textColor:[100,50,0],fontStyle:'bold'},
+    head:[['DÍA','DESAYUNO','COMIDA','DIR. COMIDA','TEL.','CENA','DIR. CENA','TEL.']],
+    body:alBody,
+    styles:{fontSize:6.8,cellPadding:2},
+    columnStyles:{0:{cellWidth:19},1:{cellWidth:24},2:{cellWidth:24},3:{cellWidth:28},4:{cellWidth:18},5:{cellWidth:24},6:{cellWidth:28},7:{cellWidth:18}}
+  });
+  y=doc.lastAutoTable.finalY+5;
+
+  // VISITAS
+  chk(30);
+  y=secTitle(doc,y,'🏠 VISITAS DE PASTOREO');
+  const visBody=[];
+  for(let i=0;i<vc;i++){
+    if(!document.getElementById(`vr${i}`)) continue;
+    visBody.push([v(`vd${i}`),v(`vh${i}`),v(`vf${i}`),v(`va${i}`),v(`vdir${i}`),v(`vtel${i}`)]);
+  }
+  if(!visBody.length) visBody.push(['-','-','-','-','-','-']);
+  doc.autoTable({...TS,startY:y,head:[['DÍA','HORA','FAMILIA','ANCIANO/SM','DIRECCIÓN','TELÉFONO']],body:visBody});
+  y=doc.lastAutoTable.finalY+5;
+
+  // AGENDA
   chk(25);
-  let vr = [];
-  for(let i=0; i<vc; i++){
-    const r = document.getElementById(`vr${i}`);
-    if(r){
-      vr.push([
-        document.getElementById(`vd${i}`)?.value||'-',
-        document.getElementById(`vh${i}`)?.value||'-',
-        document.getElementById(`vf${i}`)?.value||'-',
-        document.getElementById(`va${i}`)?.value||'-',
-        document.getElementById(`vdir${i}`)?.value||'-',
-        document.getElementById(`vtel${i}`)?.value||'-'
-      ]);
-    }
-  }
-  if(vr.length === 0) vr.push(['-','-','-','-','-','-']);
-  
-  doc.autoTable({...TS, startY: y, head: [['DÍA','HORA','FAMILIA','ANCIANO/SM','DIRECCIÓN','TELÉFONO']], body: vr});
-  y = doc.lastAutoTable.finalY + 5;
-  
-  chk(22);
-  doc.autoTable({
-    ...TS, startY: y,
-    head: [['#','ASUNTO']],
-    body: [
-      ['1.', document.getElementById('ag1').value||'-'],
-      ['2.', document.getElementById('ag2').value||'-'],
-      ['3.', document.getElementById('ag3').value||'-']
-    ],
-    columnStyles: {0: {cellWidth: 15}, 1: {cellWidth: 'auto'}}
+  y=secTitle(doc,y,'📋 AGENDA REUNIÓN ANCIANOS');
+  doc.autoTable({...TS,startY:y,head:[['#','ASUNTO']],
+    body:[['1.',v('ag1')],['2.',v('ag2')],['3.',v('ag3')]],
+    columnStyles:{0:{cellWidth:12}}
   });
-  y = doc.lastAutoTable.finalY + 6;
-  
-  chk(18);
-  doc.setFillColor(232,245,233);
-  doc.rect(M, y, W - M*2, 16, 'F');
-  doc.setTextColor(46,125,50);
-  doc.setFontSize(8);
-  const hospDir = document.getElementById('sc_direccion').value || 'No registrado';
-  const hospTel = document.getElementById('sc_telefono').value || '-';
-  doc.text(`HOSPEDAJE SC: ${hospDir} | TEL: ${hospTel}`, M+3, y+9);
-  y += 20;
-  
-  chk(32);
-  doc.setFillColor(255,248,225);
-  doc.setDrawColor(253,224,71);
-  doc.rect(M, y, W - M*2, 32, 'FD');
-  doc.setTextColor(120,53,15);
-  doc.setFontSize(8.5);
-  doc.text('NOTA: Esta página no se debe pegar en el tablero. Revisen cruces de horario. Alimentos desde miércoles.', M+3, y+8);
-  doc.text('✓ Domingo: informe con Comité de Servicio. Multimedia: JW Hub → Documentos → Archivos multimedia.', M+3, y+15);
-  doc.text('🔗 Direcciones ocultas automáticamente cuando se indica "En el hospedaje". v2.0 Mejorada.', M+3, y+22);
-  
-  const totalPages = doc.internal.getNumberOfPages();
-  for(let i=1; i<=totalPages; i++){
-    doc.setPage(i);
-    doc.setTextColor(150);
-    doc.setFontSize(7);
-    doc.text(`CHI-03 | Gilberto Flores Fabián | v2.0 | Página ${i} de ${totalPages}`, W/2, doc.internal.pageSize.getHeight()-6, {align:'center'});
+  y=doc.lastAutoTable.finalY+6;
+
+  // HOSPEDAJE FOOTER
+  chk(16);
+  doc.setFillColor(220,245,235);
+  doc.rect(M,y,W-M*2,14,'F');
+  doc.setTextColor(...teal); doc.setFontSize(8); doc.setFont('helvetica','bold');
+  doc.text(`🏠 HOSPEDAJE SC: ${v('sc_dir')}   |   TEL: ${v('sc_tel')}`,M+3,y+5);
+  y+=16;
+
+  // NOTA FINAL
+  chk(28);
+  doc.setFillColor(255,248,220);
+  doc.setDrawColor(200,150,0);
+  doc.rect(M,y,W-M*2,26,'FD');
+  doc.setTextColor(100,60,0); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.text('⚠️ NOTA: Esta página NO se debe pegar en el tablero de información.',M+3,y+6);
+  doc.text('• Revisen que no se crucen horarios  • Alimentos desde el miércoles',M+3,y+12);
+  doc.text('✓ Domingo: análisis de informe con Comité de Servicio',M+3,y+18);
+  doc.text('Multimedia: JW Hub → Documentos → Archivos multimedia  |  CHI-03 v3.0',M+3,y+24);
+
+  // PAGE NUMBERS
+  const total=doc.internal.getNumberOfPages();
+  for(let p=1;p<=total;p++){
+    doc.setPage(p);
+    doc.setTextColor(160); doc.setFontSize(6.5); doc.setFont('helvetica','normal');
+    doc.text(`CHI-03 | Gilberto Flores Fabián | v3.0 | Pág. ${p}/${total}`,W/2,doc.internal.pageSize.getHeight()-5,{align:'center'});
   }
-  
-  return {doc, cong, fec};
+
+  return {doc, cong: v('cong'), fec: v('fec')};
 }
 
-async function gen() {
-  const f = document.getElementById('f');
-  if (!f.checkValidity()) {
-    f.reportValidity();
-    showToast('⚠️ Complete los campos obligatorios marcados con *', 'warning');
+async function genPDF(){
+  if(!document.getElementById('mainForm').checkValidity()){
+    document.getElementById('mainForm').reportValidity();
+    toast('⚠️ Complete los campos obligatorios (*)','wa');
     return;
   }
-  
-  document.getElementById('loadingOverlay').classList.add('active');
-  
-  try {
-    await new Promise(r => setTimeout(r, 100));
-    const {doc, cong, fec} = await generarPDFData();
-    
-    const nombreArchivo = `Visita_SC_${cong.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'')}.pdf`;
-    doc.save(nombreArchivo);
-    
-    const waNum = document.getElementById('wa').value.replace(/\D/g,'') || '526121418717';
-    const msg = encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n📄 PDF generado correctamente: "${nombreArchivo}"\n\n✅ Revise que todas las direcciones y horarios sean correctos antes de la visita.\n\n🔗 jw.org/es | hub.jw.org`);
-    
-    setTimeout(() => {
-      window.open(`https://wa.me/${waNum}?text=${msg}`, '_blank');
-      document.getElementById('loadingOverlay').classList.remove('active');
-      showToast('✅ PDF generado y WhatsApp abierto', 'success');
-    }, 800);
-    
-  } catch(err) {
-    document.getElementById('loadingOverlay').classList.remove('active');
-    console.error(err);
-    showToast('❌ ' + err.message, 'error');
+  document.getElementById('loading').classList.add('on');
+  try{
+    await new Promise(r=>setTimeout(r,80));
+    const {doc,cong,fec}=await buildPDF();
+    const name=`Visita_SC_${cong.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'')}.pdf`;
+    doc.save(name);
+    const wa=document.getElementById('wa').value.replace(/\D/g,'')||'526121418717';
+    const msg=encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong.toUpperCase()}*\n📅 *${fec}*\n\n📄 PDF generado: "${name}"\n✅ Revise horarios y direcciones antes de la visita.\n\n🔗 jw.org/es | hub.jw.org`);
+    setTimeout(()=>{ window.open(`https://wa.me/${wa}?text=${msg}`,'_blank'); document.getElementById('loading').classList.remove('on'); toast('✅ PDF descargado y WhatsApp abierto','ok') },600);
+  }catch(e){
+    document.getElementById('loading').classList.remove('on');
+    toast('❌ '+e.message,'er');
   }
 }
-
-async function soloPDF() {
-  document.getElementById('loadingOverlay').classList.add('active');
-  try {
-    await new Promise(r => setTimeout(r, 100));
-    const {doc, cong} = await generarPDFData();
-    const nombreArchivo = `Visita_SC_${cong.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'')}.pdf`;
-    doc.save(nombreArchivo);
-    document.getElementById('loadingOverlay').classList.remove('active');
-    showToast('✅ PDF descargado correctamente', 'success');
-  } catch(err) {
-    document.getElementById('loadingOverlay').classList.remove('active');
-    showToast('❌ ' + err.message, 'error');
+async function onlyPDF(){
+  document.getElementById('loading').classList.add('on');
+  try{
+    await new Promise(r=>setTimeout(r,80));
+    const {doc,cong}=await buildPDF();
+    doc.save(`Visita_SC_${cong.replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_-]/g,'')}.pdf`);
+    document.getElementById('loading').classList.remove('on');
+    toast('✅ PDF descargado','ok');
+  }catch(e){
+    document.getElementById('loading').classList.remove('on');
+    toast('❌ '+e.message,'er');
   }
 }
+function onlyWA(){
+  const wa=document.getElementById('wa').value.replace(/\D/g,'')||'526121418717';
+  const cong=document.getElementById('cong').value||'__________';
+  const fec=document.getElementById('fec').value||'__________';
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n💡 El programa está listo. Se enviará el PDF por este medio.\n🔗 jw.org/es`)}`,'_blank');
+  toast('✅ WhatsApp abierto','ok');
+}
 
-function soloWhatsApp() {
-  const waNum = document.getElementById('wa').value.replace(/\D/g,'') || '526121418717';
-  const cong = document.getElementById('cong').value || '______________';
-  const fec = document.getElementById('fec').value || '______________';
-  const msg = encodeURIComponent(`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n💡 El programa está listo. Se enviará el PDF por este medio.\n\n🔗 jw.org/es`);
-  window.open(`https://wa.me/${waNum}?text=${msg}`, '_blank');
-  showToast('✅ WhatsApp abierto', 'success');
+// ───────────────────────────────────────────
+// SEND LOCATION SUMMARY
+// ───────────────────────────────────────────
+function sendLocationsSummary(){
+  const wa=document.getElementById('wa').value.replace(/\D/g,'')||'526121418717';
+  const v=id=>document.getElementById(id)?.value||'';
+  const cong=v('cong')||'__________', fec=v('fec')||'__________';
+  let msg=`📋 *PROGRAMA VISITA SC - CHI-03*\n🏛️ *${cong}*\n📅 *${fec}*\n\n`;
+  const scDir=v('sc_dir');
+  if(scDir) msg+=`🏠 *HOSPEDAJE SC:*\n📍 ${scDir}\n📞 ${v('sc_tel')||'-'}\n🗺️ ${mapsUrl(scDir)}\n\n`;
+  msg+=`*📅 REUNIONES:*\n\n`;
+  const reu=[
+    {n:'Martes – 1er Discurso', d:'r1d', t:'r1t', h:'r1h'},
+    {n:`${v('r2d')||'Mié.'} – Precursores`, d:'r2d_dir', t:'r2t', h:'r2h'},
+    {n:'Viernes – Ancianos/SM', d:'r3d', t:'r3t', h:'r3h'},
+    {n:`${v('r4d')||'Sáb.'} – Disc. Público`, d:'r4d_dir', t:'r4t', h:'r4h'}
+  ];
+  reu.forEach(r=>{
+    const dir=v(r.d);
+    if(dir){
+      msg+=`• *${r.n}*\n`;
+      const h=v(r.h); if(h) msg+=`🕐 ${h}\n`;
+      msg+=`📍 ${dir}\n`;
+      const t=v(r.t); if(t) msg+=`📞 ${t}\n`;
+      msg+=`🗺️ ${mapsUrl(dir)}\n\n`;
+    }
+  });
+  window.open(`https://wa.me/${wa}?text=${encodeURIComponent(msg)}`,'_blank');
+  toast('✅ WhatsApp de ubicaciones abierto','ok');
 }
 </script>
 </body>
